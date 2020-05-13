@@ -4,20 +4,49 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+  
+  struct Interval {
+    var minutes: Int
+    var seconds: Int
+
+    mutating func tick() -> Bool {
+      if seconds > 0 {
+        seconds -= 1
+      } else if minutes > 0 {
+        minutes -= 1
+        seconds = 59
+      }
+      return minutes > 0 || seconds > 0
+    }
+    
+  }
 
   @IBOutlet weak var window: NSWindow!
   
+  var timer: Timer!
   let statusItem = NSStatusBar.system.statusItem(withLength: -1)
   
-  var minutes = 0
-  var seconds = 0
-  var timer: Timer!
+  let workTime  = Interval(minutes: 0, seconds: 6)
+  let smallTime = Interval(minutes: 0, seconds: 2)
+  let largeTime = Interval(minutes: 0, seconds: 4)
+
+  var work = true
+  var session = 0
+  var timerState = Interval(minutes: 0, seconds: 0)
   
   @objc func start() {
     timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.tick), userInfo: nil, repeats: true)
     statusItem.action = #selector(AppDelegate.pause)
-    minutes = 25
-    seconds = 00
+    if work {
+      timerState = workTime
+      session += 1
+    } else if session < 2 {
+      timerState = smallTime
+    } else {
+      timerState = largeTime
+      session = 0
+    }
+    work = !work
     tick()
   }
   
@@ -28,13 +57,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   @objc func tick() {
-    if seconds > 0 {
-      seconds -= 1
-    } else if minutes > 0 {
-      minutes -= 1
-      seconds = 59
-    }
-    if minutes > 0 || seconds > 0 {
+    if timerState.tick() {
       setTime()
     } else {
       self.timer.invalidate()
@@ -44,7 +67,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func setTime() {
-    statusItem.title = String(format: "%02d:%02d", minutes, seconds)
+    statusItem.title = String(format: "%02d:%02d", timerState.minutes, timerState.seconds)
   }
 
   func applicationDidFinishLaunching(_ aNotification: Notification) {
