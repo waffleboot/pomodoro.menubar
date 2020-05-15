@@ -6,6 +6,7 @@ import Cocoa
 class AppDelegate: NSObject, NSApplicationDelegate {
   
   struct Interval {
+
     var minutes: Int
     var seconds: Int
 
@@ -21,8 +22,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
   }
 
-  @IBOutlet weak var window: NSWindow!
-  
   var timer: Timer!
   let statusItem = NSStatusBar.system.statusItem(withLength: -1)
   
@@ -72,7 +71,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   func applicationDidFinishLaunching(_ aNotification: Notification) {
     statusItem.title = "hh:mm"
-    statusItem.target = self
     statusItem.action = #selector(AppDelegate.start)
 //    statusItem.image = NSImage(named: NSImage.Name("TimerIcon"))
 //    self.statusItem = NSStatusBar.system.statusItem(withLength: 32)
