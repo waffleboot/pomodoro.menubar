@@ -1,4 +1,3 @@
-//
 
 import Cocoa
 
@@ -6,15 +5,15 @@ class MyWindowController: NSWindowController, NSWindowDelegate {
   
   @IBOutlet weak var label: NSTextField!
   @IBOutlet weak var stopButton: NSButton!
-  
-  weak var main: AppDelegate!
+
+  weak var app: AppDelegate!
   
   @IBAction func stop(_ sender: Any) {
-    main.wndStop()
+    app.stopButtonPressed()
   }
   
   @IBAction func next(_ sender: Any) {
-    main.wndNext()
+    app.nextButtonPressed()
   }
   
   @IBAction func exit(_ sender: Any) {
@@ -22,7 +21,6 @@ class MyWindowController: NSWindowController, NSWindowDelegate {
   }
   
   func window(_ window: NSWindow, willUseFullScreenPresentationOptions proposedOptions: NSApplication.PresentationOptions = []) -> NSApplication.PresentationOptions {
-    print("full")
     var ans = proposedOptions
 //    ans.insert(NSApplication.PresentationOptions.hideDock)
 //    ans.insert(NSApplication.PresentationOptions.autoHideMenuBar)
@@ -67,18 +65,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   let smallTime = Interval(minutes: 0, seconds: 4)
   let largeTime = Interval(minutes: 0, seconds: 6)
 
-  var work = false
   var session = 0
   var timerState = Interval(minutes: 0, seconds: 0)
   
-  func next() -> Interval {
-    return work ? workTime : session < 2 ? smallTime : largeTime
-  }
-  
-  
-  
   func timerInit() {
-    updateStatusBar(time: workTime)
+    updateStatusBar(workTime)
     statusItem.action = #selector(AppDelegate.startWorkTimerWithTick)
   }
 
@@ -96,7 +87,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   @objc func workTimerTick() {
     timerState.tick()
-    updateStatusBar(time: timerState)
+    updateStatusBar(timerState)
     if timerState.done {
       timer.invalidate()
       startRelaxTimer()
@@ -111,7 +102,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func startRelaxTimer() {
     if ctrl == nil {
       ctrl = MyWindowController(windowNibName: NSNib.Name("Window"))
-      ctrl.main = self
+      ctrl.app = self
       //        let rect = NSScreen.main?.frame
       //        ctrl.window?.setFrame(rect!, display: false)
       //        ctrl.window?.toggleFullScreen(nil)
@@ -123,16 +114,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     } else {
       timerState = smallTime
     }
-    updateStatusBar(time: timerState)
-    updateWindowTimer(time: timerState)
+    updateStatusBar(timerState)
+    updateFullScreenWindow(timerState)
     statusItem.action = #selector(AppDelegate.stopRelaxTimer)
     timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.relaxTimerTick), userInfo: nil, repeats: true)
   }
 
   @objc func relaxTimerTick() {
     timerState.tick()
-    updateStatusBar(time: timerState)
-    updateWindowTimer(time: timerState)
+    updateStatusBar(timerState)
+    updateFullScreenWindow(timerState)
     if timerState.done {
       timer.invalidate()
       ctrl.stopButton.isEnabled = false
@@ -140,33 +131,32 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   @objc func stopRelaxTimer() {
-    timer.invalidate()
-    ctrl.stopButton.isEnabled = false
+    stopButtonPressed()
   }
   
-  func wndNext() {
+  func nextButtonPressed() {
     timer.invalidate()
-    wndClose()
+    closeFullScreenWindow()
     startWorkTimer()
     workTimerTick()
   }
   
-  func wndStop() {
+  func stopButtonPressed() {
     timer.invalidate()
     timerInit()
-    wndClose()
+    closeFullScreenWindow()
   }
   
-  func wndClose() {
+  func closeFullScreenWindow() {
     ctrl.close()
     ctrl.stopButton.isEnabled = true
   }
   
-  func updateStatusBar(time: Interval) {
+  func updateStatusBar(_ time: Interval) {
     statusItem.title = String(format: "%02d:%02d", time.minutes, time.seconds)
   }
   
-  func updateWindowTimer(time: Interval) {
+  func updateFullScreenWindow(_ time: Interval) {
     ctrl.label.stringValue = String(format: "%02d:%02d", time.minutes, time.seconds)
   }
   
