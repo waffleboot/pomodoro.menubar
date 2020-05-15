@@ -55,6 +55,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       return minutes == 0 && seconds == 0
     }
     
+    var notify: Bool {
+      return minutes == 0 && seconds == 2
+    }
+    
   }
 
   var timer: Timer!
@@ -91,6 +95,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     if timerState.done {
       timer.invalidate()
       startRelaxTimer()
+    } else if timerState.notify {
+      print("notify")
+      // TODO notify
     }
   }
   
