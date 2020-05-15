@@ -2,6 +2,22 @@
 
 import Cocoa
 
+class MyWindowController: NSWindowController, NSWindowDelegate {
+  
+  @IBAction func exit(_ sender: Any) {
+    NSApplication.shared.terminate(nil)
+  }
+  
+  func window(_ window: NSWindow, willUseFullScreenPresentationOptions proposedOptions: NSApplication.PresentationOptions = []) -> NSApplication.PresentationOptions {
+    var ans = proposedOptions
+    if proposedOptions.contains(NSApplication.PresentationOptions.fullScreen) {
+      print("has")
+    }
+    ans.insert(NSApplication.PresentationOptions.disableProcessSwitching)
+    return ans
+  }
+}
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
   
@@ -24,6 +40,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   var timer: Timer!
   let statusItem = NSStatusBar.system.statusItem(withLength: -1)
+  var ctrl: MyWindowController!
   
   let workTime  = Interval(minutes: 0, seconds: 6)
   let smallTime = Interval(minutes: 0, seconds: 2)
@@ -68,6 +85,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     if timerState.tick() {
       setTime()
     } else {
+      if work {
+        ctrl = MyWindowController(windowNibName: NSNib.Name("Window"))
+//        var opts = ctrl.window?.collectionBehavior
+//        opts?.insert(NSWindow.CollectionBehavior.fullScreenPrimary)
+//        ctrl.window?.collectionBehavior = opts!
+        ctrl.window?.toggleFullScreen(nil)
+        ctrl.showWindow(nil)
+      }
       stop()
     }
   }

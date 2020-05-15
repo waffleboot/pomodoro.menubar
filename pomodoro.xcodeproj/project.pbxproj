@@ -7,12 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F539EB8E246E1F9300DD94C4 /* Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = F539EB8D246E1F9300DD94C4 /* Window.xib */; };
 		F5FFEF99246C46AA003C0429 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FFEF98246C46AA003C0429 /* AppDelegate.swift */; };
 		F5FFEF9B246C46AA003C0429 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5FFEF9A246C46AA003C0429 /* Assets.xcassets */; };
 		F5FFEF9E246C46AA003C0429 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = F5FFEF9C246C46AA003C0429 /* MainMenu.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F539EB8D246E1F9300DD94C4 /* Window.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Window.xib; sourceTree = "<group>"; };
 		F5FFEF95246C46AA003C0429 /* pomodoro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pomodoro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5FFEF98246C46AA003C0429 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F5FFEF9A246C46AA003C0429 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -52,6 +54,7 @@
 			isa = PBXGroup;
 			children = (
 				F5FFEF98246C46AA003C0429 /* AppDelegate.swift */,
+				F539EB8D246E1F9300DD94C4 /* Window.xib */,
 				F5FFEF9A246C46AA003C0429 /* Assets.xcassets */,
 				F5FFEF9C246C46AA003C0429 /* MainMenu.xib */,
 				F5FFEF9F246C46AA003C0429 /* Info.plist */,
@@ -121,6 +124,7 @@
 			files = (
 				F5FFEF9B246C46AA003C0429 /* Assets.xcassets in Resources */,
 				F5FFEF9E246C46AA003C0429 /* MainMenu.xib in Resources */,
+				F539EB8E246E1F9300DD94C4 /* Window.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
