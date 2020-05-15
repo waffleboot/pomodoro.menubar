@@ -33,9 +33,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   var session = 0
   var timerState = Interval(minutes: 0, seconds: 0)
   
+  func next() -> Interval {
+    return work ? workTime : session < 2 ? smallTime : largeTime
+  }
+  
   @objc func start() {
-    timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.tick), userInfo: nil, repeats: true)
-    statusItem.action = #selector(AppDelegate.pause)
+    statusItem.action = #selector(AppDelegate.stop)
     if work {
       timerState = workTime
       session += 1
@@ -45,13 +48,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       timerState = largeTime
       session = 0
     }
-    work = !work
+    timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.tick), userInfo: nil, repeats: true)
     tick()
   }
   
-  @objc func pause() {
+  @objc func stop() {
     self.timer.invalidate()
-    statusItem.title = "hh:mm"
+    if work {
+      timerState = session < 2 ? smallTime : largeTime
+    } else {
+      timerState = workTime
+    }
+    setTime()
+    work = !work
     statusItem.action = #selector(AppDelegate.start)
   }
   
@@ -59,9 +68,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     if timerState.tick() {
       setTime()
     } else {
-      self.timer.invalidate()
-      statusItem.title = "hh:mm"
-      statusItem.action = #selector(AppDelegate.start)
+      stop()
     }
   }
   
@@ -70,7 +77,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   func applicationDidFinishLaunching(_ aNotification: Notification) {
-    statusItem.title = "hh:mm"
+    timerState = workTime
+    setTime()
     statusItem.action = #selector(AppDelegate.start)
 //    statusItem.image = NSImage(named: NSImage.Name("TimerIcon"))
 //    self.statusItem = NSStatusBar.system.statusItem(withLength: 32)
