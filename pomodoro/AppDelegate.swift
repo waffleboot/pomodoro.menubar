@@ -96,8 +96,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       timer.invalidate()
       startRelaxTimer()
     } else if timerState.notify {
-      print("notify")
-      // TODO notify
+      let note = NSUserNotification()
+      note.title = "Pomodoro"
+      note.informativeText = "Ready!"
+      NSUserNotificationCenter.default.deliver(note)
     }
   }
   
