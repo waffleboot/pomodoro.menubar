@@ -4,7 +4,8 @@ import Cocoa
 class MyWindowController: NSWindowController, NSWindowDelegate {
   
   @IBOutlet weak var label: NSTextField!
-  @IBOutlet weak var stopButton: NSButton!
+  @IBOutlet weak var nextButton: NSButton!
+  @IBOutlet weak var messageLabel: NSTextField!
 
   weak var app: AppDelegate!
   
@@ -112,10 +113,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     if ctrl == nil {
       ctrl = MyWindowController(windowNibName: NSNib.Name("Window"))
       ctrl.app = self
+      ctrl.loadWindow()
       //        let rect = NSScreen.main?.frame
       //        ctrl.window?.setFrame(rect!, display: false)
       //        ctrl.window?.toggleFullScreen(nil)
     }
+    ctrl.messageLabel.stringValue = "Take a break!"
+    ctrl.nextButton.isHidden = true
     ctrl.showWindow(nil)
     if session == 2 {
       session = 0
@@ -135,7 +139,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     updateFullScreenWindow(timerState)
     if timerState.done {
       timer.invalidate()
-      ctrl.stopButton.isEnabled = false
+      ctrl.messageLabel.stringValue = "Back to work!"
+      ctrl.nextButton.isHidden = false
     }
   }
   
@@ -158,7 +163,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func closeFullScreenWindow() {
     ctrl.close()
-    ctrl.stopButton.isEnabled = true
   }
   
   func updateStatusBar(_ time: Interval) {

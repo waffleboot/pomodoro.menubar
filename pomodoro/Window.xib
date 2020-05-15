@@ -9,7 +9,8 @@
         <customObject id="-2" userLabel="File's Owner" customClass="MyWindowController" customModule="pomodoro" customModuleProvider="target">
             <connections>
                 <outlet property="label" destination="TCY-Fi-3he" id="slC-Mc-e1x"/>
-                <outlet property="stopButton" destination="qcF-44-dSd" id="ssB-Fx-4KN"/>
+                <outlet property="messageLabel" destination="EMt-UH-MQS" id="Oee-v6-Nc0"/>
+                <outlet property="nextButton" destination="sqZ-8M-b7E" id="ydN-ab-EAe"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="5Sg-i7-O85"/>
             </connections>
         </customObject>
@@ -65,6 +66,15 @@
                         <rect key="frame" x="174" y="164" width="159" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" alignment="center" title="mm:ss" id="6Td-U5-3Wo">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EMt-UH-MQS" userLabel="messageLabel">
+                        <rect key="frame" x="174" y="204" width="159" height="36"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="label" id="HDm-bU-k9E">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
