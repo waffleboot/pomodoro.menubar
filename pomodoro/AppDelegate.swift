@@ -227,7 +227,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   @objc func onMenuStart() {
-    startWorkTimer()
+    startWorkTimerWithTick()
   }
   
   @objc func onMenuStop() {
@@ -301,8 +301,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     menu.addItem(NSMenuItem(title: "Release Pomodoro", action: #selector(AppDelegate.onMenuRelease), keyEquivalent: ""))
   }
   
-  func setAndUpdateMenu(_ target: Int, _ tag: Int, _ updater: (Int) -> ()) {
-    updater(target)
+  func setAndUpdateMenu(_ target: Int, _ tag: Int) {
     if let x = statusItem.menu, let y = x.item(withTag: tag), let z = y.submenu {
       for submenu in z.items {
         submenu.state = submenu.tag == target ? .on : .off
@@ -310,83 +309,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
   }
   
-  func setSessionsCount(_ target: Int) {
-    setAndUpdateMenu(target, AppDelegate.sessionsMenuTag) { (_ target: Int) in
-      timerSettings.sessions = target
+  @objc func onSessionsMenu(_ sender: NSMenuItem) {
+    timerSettings.sessions = sender.tag
+    setAndUpdateMenu(sender.tag, AppDelegate.sessionsMenuTag)
+  }
+  
+  @objc func onWorkTimeMenu(_ sender: NSMenuItem) {
+    timerSettings.workTime.minutes = sender.tag
+    if !running {
+      updateStatusBar(timerSettings.workTime)
     }
+    setAndUpdateMenu(sender.tag, AppDelegate.workTimeMenuTag)
   }
   
-  func setWorkTime(_ target: Int) {
-    setAndUpdateMenu(target, AppDelegate.workTimeMenuTag) { (_ target: Int) in
-      timerSettings.workTime.minutes = target
-      if !running {
-        updateStatusBar(timerSettings.workTime)
-      }
-    }
-  }
-  
-  func setSmallTime(_ target: Int) {
-    setAndUpdateMenu(target, AppDelegate.smallTimeMenuTag) { (_ target: Int) in
-      timerSettings.smallTime.minutes = target
-    }
-  }
-  
-  func setLargeTime(_ target: Int) {
-    setAndUpdateMenu(target, AppDelegate.largeTimeMenuTag) { (_ target: Int) in
-      timerSettings.largeTime.minutes = target
-    }
-  }
-  
-  @objc func onSessionsMenu2() {
-    setSessionsCount(2)
-  }
-  
-  @objc func onSessionsMenu3() {
-    setSessionsCount(3)
+  @objc func onSmallTimeMenu(_ sender: NSMenuItem) {
+    timerSettings.smallTime.minutes = sender.tag
+    setAndUpdateMenu(sender.tag, AppDelegate.smallTimeMenuTag)
   }
 
-  @objc func onSessionsMenu4() {
-    setSessionsCount(4)
-  }
-
-  @objc func onSessionsMenu5() {
-    setSessionsCount(5)
-  }
-  
-  @objc func onWorkTimeMenu25() {
-    setWorkTime(25)
-  }
-
-  @objc func onWorkTimeMenu30() {
-    setWorkTime(30)
-  }
-  
-  @objc func onSmallTimeMenu3() {
-    setSmallTime(3)
-  }
-
-  @objc func onSmallTimeMenu5() {
-    setSmallTime(5)
-  }
-
-  @objc func onSmallTimeMenu7() {
-    setSmallTime(7)
-  }
-
-  @objc func onSmallTimeMenu10() {
-    setSmallTime(10)
-  }
-
-  @objc func onLargeTimeMenu10() {
-    setLargeTime(10)
-  }
-
-  @objc func onLargeTimeMenu15() {
-    setLargeTime(15)
-  }
-  
-  @objc func onLargeTimeMenu20() {
-    setLargeTime(20)
+  @objc func onLargeTimeMenu(_ sender: NSMenuItem) {
+    timerSettings.largeTime.minutes = sender.tag
+    setAndUpdateMenu(sender.tag, AppDelegate.largeTimeMenuTag)
   }
 
   struct item {
@@ -409,34 +352,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func createSessionsMenu() -> NSMenu {
     let items: [item] = [
-      item(value:2, selector: #selector(AppDelegate.onSessionsMenu2)),
-      item(value:3, selector: #selector(AppDelegate.onSessionsMenu3)),
-      item(value:4, selector: #selector(AppDelegate.onSessionsMenu4)),
-      item(value:5, selector: #selector(AppDelegate.onSessionsMenu5))]
+      item(value:2, selector: #selector(AppDelegate.onSessionsMenu)),
+      item(value:3, selector: #selector(AppDelegate.onSessionsMenu)),
+      item(value:4, selector: #selector(AppDelegate.onSessionsMenu)),
+      item(value:5, selector: #selector(AppDelegate.onSessionsMenu))]
     return createItemsMenu(items) { (_ value: Int) in timerSettings.sessions == value }
   }
   
   func createWorkTimeMenu() -> NSMenu {
     let items: [item] = [
-      item(value:25, selector: #selector(AppDelegate.onWorkTimeMenu25)),
-      item(value:30, selector: #selector(AppDelegate.onWorkTimeMenu30))]
+      item(value:20, selector: #selector(AppDelegate.onWorkTimeMenu)),
+      item(value:25, selector: #selector(AppDelegate.onWorkTimeMenu)),
+      item(value:30, selector: #selector(AppDelegate.onWorkTimeMenu))]
     return createItemsMenu(items) { (_ value: Int) in timerSettings.workTime.minutes == value }
   }
 
   func createSmallTimeMenu() -> NSMenu {
     let items: [item] = [
-      item(value:3, selector: #selector(AppDelegate.onSmallTimeMenu3)),
-      item(value:5, selector: #selector(AppDelegate.onSmallTimeMenu5)),
-      item(value:7, selector: #selector(AppDelegate.onSmallTimeMenu7)),
-      item(value:10, selector: #selector(AppDelegate.onSmallTimeMenu10))]
+      item(value:3, selector: #selector(AppDelegate.onSmallTimeMenu)),
+      item(value:5, selector: #selector(AppDelegate.onSmallTimeMenu)),
+      item(value:7, selector: #selector(AppDelegate.onSmallTimeMenu)),
+      item(value:10, selector: #selector(AppDelegate.onSmallTimeMenu))]
     return createItemsMenu(items) { (_ value: Int) in timerSettings.smallTime.minutes == value }
   }
   
   func createLargeTimeMenu() -> NSMenu {
     let items: [item] = [
-      item(value:10, selector: #selector(AppDelegate.onLargeTimeMenu10)),
-      item(value:15, selector: #selector(AppDelegate.onLargeTimeMenu15)),
-      item(value:20, selector: #selector(AppDelegate.onLargeTimeMenu20))]
+      item(value:10, selector: #selector(AppDelegate.onLargeTimeMenu)),
+      item(value:15, selector: #selector(AppDelegate.onLargeTimeMenu)),
+      item(value:20, selector: #selector(AppDelegate.onLargeTimeMenu))]
     return createItemsMenu(items) { (_ value: Int) in timerSettings.largeTime.minutes == value }
   }
   
