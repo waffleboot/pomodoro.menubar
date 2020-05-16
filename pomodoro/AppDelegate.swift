@@ -50,10 +50,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       return minutes == 0 && seconds == 0
     }
     
-    func notify(_ o: Interval) -> Bool {
-      return minutes == o.minutes && seconds == o.seconds
-    }
-    
   }
   
   struct TimerSettings {
@@ -127,7 +123,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     if timerState.done {
       timer.invalidate()
       startRelaxTimer()
-    } else if timerState.notify(timerSettings.notify) {
+    } else if timerState == timerSettings.notify {
       notify()
     }
   }
@@ -285,25 +281,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     statusItem.menu = menu
   }
   
-  static let sessionsMenuTag = 100
-  static let workTimeMenuTag = 101
-  static let smallTimeMenuTag = 102
-  static let largeTimeMenuTag = 103
+  enum SettingsMenu: Int {
+    case notifyMenuTag = 100,
+    sessionsMenuTag,
+    workTimeMenuTag,
+    smallTimeMenuTag,
+    largeTimeMenuTag
+  }
+  
   
   func addSettingsMenuItems(_ menu: NSMenu) {
     menu.addItem(.separator())
     
-    let constructor = { (_ title: String, _ tag: Int, _ items: () -> NSMenu) in
+    let constructor = { (_ title: String, _ tag: SettingsMenu, _ items: () -> NSMenu) in
       let submenu = NSMenuItem(title: title, action: nil, keyEquivalent: "")
-      submenu.tag = tag
+      submenu.tag = tag.rawValue
       submenu.submenu = items()
       menu.addItem(submenu)
     }
     
-    constructor("Sessions", AppDelegate.sessionsMenuTag, createSessionsMenu)
-    constructor("Work Time", AppDelegate.workTimeMenuTag, createWorkTimeMenu)
-    constructor("Small Time", AppDelegate.smallTimeMenuTag, createSmallTimeMenu)
-    constructor("Large Time", AppDelegate.largeTimeMenuTag, createLargeTimeMenu)
+    constructor("Notify", .notifyMenuTag, createNotifyMenu)
+    constructor("Sessions", .sessionsMenuTag, createSessionsMenu)
+    constructor("Work Time", .workTimeMenuTag, createWorkTimeMenu)
+    constructor("Small Time", .smallTimeMenuTag, createSmallTimeMenu)
+    constructor("Large Time", .largeTimeMenuTag, createLargeTimeMenu)
 
     menu.addItem(.separator())
     menu.addItem(NSMenuItem(title: "Fast Pomodoro", action: #selector(AppDelegate.onMenuFast), keyEquivalent: ""))
@@ -311,7 +312,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     menu.addItem(NSMenuItem(title: "Release Pomodoro", action: #selector(AppDelegate.onMenuRelease), keyEquivalent: ""))
   }
   
-  func setAndUpdateMenu<T>(_ target: Int, _ tag: Int, _ items: [item<T>], _ updater: (T) -> ()) {
+  func setAndUpdateMenu<T>(_ target: Int, _ tag: SettingsMenu, _ items: [item<T>], _ updater: (T) -> ()) {
     var i = 0
     for item in items {
       if target == i {
@@ -320,30 +321,34 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       }
       i += 1
     }
-    if let x = statusItem.menu, let y = x.item(withTag: tag), let z = y.submenu {
+    if let x = statusItem.menu, let y = x.item(withTag: tag.rawValue), let z = y.submenu {
       for submenu in z.items {
         submenu.state = submenu.tag == target ? .on : .off
       }
     }
   }
   
+  @objc func onNotifyMenu(_ sender: NSMenuItem) {
+    setAndUpdateMenu(sender.tag, .notifyMenuTag, notifyItems, { timerSettings.notify = $0 })
+  }
+  
   @objc func onSessionsMenu(_ sender: NSMenuItem) {
-    setAndUpdateMenu(sender.tag, AppDelegate.sessionsMenuTag, sessionItems, { timerSettings.sessions = $0 })
+    setAndUpdateMenu(sender.tag, .sessionsMenuTag, sessionItems, { timerSettings.sessions = $0 })
   }
   
   @objc func onWorkTimeMenu(_ sender: NSMenuItem) {
-    setAndUpdateMenu(sender.tag, AppDelegate.workTimeMenuTag, workTimeItems, { timerSettings.workTime = $0 })
+    setAndUpdateMenu(sender.tag, .workTimeMenuTag, workTimeItems, { timerSettings.workTime = $0 })
     if !running {
       updateStatusBar(timerSettings.workTime)
     }
   }
   
   @objc func onSmallTimeMenu(_ sender: NSMenuItem) {
-    setAndUpdateMenu(sender.tag, AppDelegate.smallTimeMenuTag, smallTimeItems, { timerSettings.smallTime = $0 })
+    setAndUpdateMenu(sender.tag, .smallTimeMenuTag, smallTimeItems, { timerSettings.smallTime = $0 })
   }
 
   @objc func onLargeTimeMenu(_ sender: NSMenuItem) {
-    setAndUpdateMenu(sender.tag, AppDelegate.largeTimeMenuTag, largeTimeItems, { timerSettings.largeTime = $0 })
+    setAndUpdateMenu(sender.tag, .largeTimeMenuTag, largeTimeItems, { timerSettings.largeTime = $0 })
   }
 
   struct item<T> {
@@ -366,6 +371,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     return menu
   }
   
+  let notifyItems = [
+    item(title: "30 сек", value: Interval(minutes: 0, seconds: 30)),
+    item(title: "1 мин", value: Interval(minutes: 1, seconds: 0))
+  ]
+  
   let sessionItems = [
     item(title: "2", value:2),
     item(title: "3", value:3),
@@ -375,7 +385,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   let workTimeItems = [
     item(title: "20 мин", value: Interval(minutes: 20, seconds: 0)),
     item(title: "25 мин", value: Interval(minutes: 25, seconds: 0)),
-    item(title: "30 мин", value: Interval(minutes: 30, seconds: 0))]
+    item(title: "30 мин", value: Interval(minutes: 30, seconds: 0)),
+    item(title: "40 мин", value: Interval(minutes: 40, seconds: 0))]
   
   let smallTimeItems = [
     item(title: "3 мин", value: Interval(minutes: 3, seconds: 0)),
@@ -388,6 +399,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     item(title: "10 мин", value: Interval(minutes: 10, seconds: 0)),
     item(title: "15 мин", value: Interval(minutes: 15, seconds: 0)),
     item(title: "20 мин", value: Interval(minutes: 20, seconds: 0))]
+  
+  func createNotifyMenu() -> NSMenu {
+    return createItemsMenu(notifyItems, #selector(AppDelegate.onNotifyMenu)) { timerSettings.notify == $0 }
+  }
   
   func createSessionsMenu() -> NSMenu {
     return createItemsMenu(sessionItems, #selector(AppDelegate.onSessionsMenu)) { timerSettings.sessions == $0 }
