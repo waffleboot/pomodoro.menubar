@@ -21,18 +21,6 @@ class MyWindowController: NSWindowController, NSWindowDelegate {
     NSApplication.shared.terminate(nil)
   }
   
-  func window(_ window: NSWindow, willUseFullScreenPresentationOptions proposedOptions: NSApplication.PresentationOptions = []) -> NSApplication.PresentationOptions {
-    var ans = proposedOptions
-//    ans.insert(NSApplication.PresentationOptions.hideDock)
-//    ans.insert(NSApplication.PresentationOptions.autoHideMenuBar)
-//    ans.insert(NSApplication.PresentationOptions.disableAppleMenu)
-//    ans.insert(NSApplication.PresentationOptions.disableProcessSwitching)
-//    ans.insert(NSApplication.PresentationOptions.disableForceQuit)
-//    ans.insert(NSApplication.PresentationOptions.disableSessionTermination)
-//    ans.insert(NSApplication.PresentationOptions.disableHideApplication)
-//    ans.insert(NSApplication.PresentationOptions.autoHideToolbar)
-    return ans
-  }
 }
 
 @NSApplicationMain
@@ -56,25 +44,53 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       return minutes == 0 && seconds == 0
     }
     
-    var notify: Bool {
-      return minutes == 0 && seconds == 2
+    func notify(_ o: Interval) -> Bool {
+      return minutes == o.minutes && seconds == o.seconds
     }
     
   }
+  
+  struct TimerSettings {
+    var autostart: Bool
+    var notify: Interval
+    var workTime: Interval
+    var smallTime: Interval
+    var largeTime: Interval
+  }
+
+  static let fastTimerSettings = TimerSettings(
+    autostart: true,
+    notify: Interval(minutes: 0, seconds: 1),
+    workTime: Interval(minutes: 0, seconds: 3),
+    smallTime: Interval(minutes: 0, seconds: 3),
+    largeTime: Interval(minutes: 0, seconds: 3))
+  
+  static let debugTimerSettings = TimerSettings(
+    autostart: true,
+    notify: Interval(minutes: 0, seconds: 5),
+    workTime: Interval(minutes: 0, seconds: 10),
+    smallTime: Interval(minutes: 0, seconds: 3),
+    largeTime: Interval(minutes: 0, seconds: 3))
+  
+  static let releaseTimerSettings = TimerSettings(
+    autostart: false,
+    notify: Interval(minutes: 1, seconds: 0),
+    workTime: Interval(minutes: 25, seconds: 0),
+    smallTime: Interval(minutes: 5, seconds: 0),
+    largeTime: Interval(minutes: 20, seconds: 0))
+  
+  var timerSettings = AppDelegate.releaseTimerSettings
 
   var timer: Timer!
   var ctrl: MyWindowController!
   let statusItem = NSStatusBar.system.statusItem(withLength: -1)
-  
-  let workTime  = Interval(minutes: 0, seconds: 10)
-  let smallTime = Interval(minutes: 0, seconds: 4)
-  let largeTime = Interval(minutes: 0, seconds: 6)
 
   var session = 0
+  var color = false
   var timerState = Interval(minutes: 0, seconds: 0)
   
   func timerInit() {
-    updateStatusBar(workTime)
+    updateStatusBar(timerSettings.workTime)
     statusItem.action = #selector(AppDelegate.startWorkTimerWithTick)
   }
 
@@ -85,7 +101,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func startWorkTimer() {
     session += 1
-    timerState = workTime
+    timerState = timerSettings.workTime
     statusItem.action = #selector(AppDelegate.stopWorkTimer)
     timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.workTimerTick), userInfo: nil, repeats: true)
   }
@@ -96,12 +112,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     if timerState.done {
       timer.invalidate()
       startRelaxTimer()
-    } else if timerState.notify {
-      let note = NSUserNotification()
-      note.title = "Pomodoro"
-      note.informativeText = "Ready!"
-      NSUserNotificationCenter.default.deliver(note)
+    } else if timerState.notify(timerSettings.notify) {
+      notify()
     }
+  }
+  
+  func notify() {
+    let note = NSUserNotification()
+    note.title = "Pomodoro"
+    note.informativeText = "Ready!"
+    NSUserNotificationCenter.default.deliver(note)
   }
   
   @objc func stopWorkTimer() {
@@ -110,38 +130,37 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func startRelaxTimer() {
-    if ctrl == nil {
-      ctrl = MyWindowController(windowNibName: NSNib.Name("Window"))
-      ctrl.app = self
-      ctrl.loadWindow()
-      //        let rect = NSScreen.main?.frame
-      //        ctrl.window?.setFrame(rect!, display: false)
-      //        ctrl.window?.toggleFullScreen(nil)
-    }
-    ctrl.messageLabel.stringValue = "Take a break!"
-    ctrl.nextButton.isHidden = true
-    ctrl.showWindow(nil)
     if session == 2 {
       session = 0
-      timerState = largeTime
+      timerState = timerSettings.largeTime
     } else {
-      timerState = smallTime
+      timerState = timerSettings.smallTime
     }
+    createFullScreenWindow()
     updateStatusBar(timerState)
     updateFullScreenWindow(timerState)
+    openFullScreenWindow()
     statusItem.action = #selector(AppDelegate.stopRelaxTimer)
     timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.relaxTimerTick), userInfo: nil, repeats: true)
   }
 
   @objc func relaxTimerTick() {
     timerState.tick()
-    updateStatusBar(timerState)
-    updateFullScreenWindow(timerState)
     if timerState.done {
       timer.invalidate()
       ctrl.messageLabel.stringValue = "Back to work!"
       ctrl.nextButton.isHidden = false
+      ctrl.label.isHidden = true
+      timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.blink), userInfo: nil, repeats: true)
+    } else {
+      updateStatusBar(timerState)
+      updateFullScreenWindow(timerState)
     }
+  }
+  
+  @objc func blink() {
+    ctrl.messageLabel.textColor = color ? NSColor.white : NSColor.red
+    color = !color
   }
   
   @objc func stopRelaxTimer() {
@@ -161,8 +180,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     closeFullScreenWindow()
   }
   
+  func createFullScreenWindow() {
+    ctrl = MyWindowController(windowNibName: NSNib.Name("Window"))
+    ctrl.app = self
+    let rect = NSScreen.main?.frame
+    ctrl.window?.setFrame(rect!, display: false)
+    ctrl.window?.backgroundColor = NSColor.black
+    ctrl.nextButton.isHidden = true
+  }
+  
+  func openFullScreenWindow() {
+    ctrl.window?.toggleFullScreen(nil)
+  }
+  
   func closeFullScreenWindow() {
     ctrl.close()
+    ctrl = nil
   }
   
   func updateStatusBar(_ time: Interval) {
@@ -175,11 +208,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func applicationDidFinishLaunching(_ aNotification: Notification) {
     timerInit()
-//    statusItem.image = NSImage(named: NSImage.Name("TimerIcon"))
-//    self.statusItem = NSStatusBar.system.statusItem(withLength: 32)
-//    self.statusItem.button?.image = NSImage(named: "TimerIcon")
-//    self.statusItem.length = 64
-//    self.statusItem.button?.title = "15:30"
+    if timerSettings.autostart {
+      startWorkTimer()
+    }
   }
 
   func applicationWillTerminate(_ aNotification: Notification) {
