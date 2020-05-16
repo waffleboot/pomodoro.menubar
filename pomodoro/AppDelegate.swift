@@ -90,10 +90,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   var timerState = Interval(minutes: 0, seconds: 0)
   
   func timerInit() {
+    initialTimerMenu()
     updateStatusBar(timerSettings.workTime)
     statusItem.action = #selector(AppDelegate.startWorkTimerWithTick)
   }
-
+  
   @objc func startWorkTimerWithTick() {
     startWorkTimer()
     workTimerTick()
@@ -104,6 +105,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     timerState = timerSettings.workTime
     statusItem.action = #selector(AppDelegate.stopWorkTimer)
     timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.workTimerTick), userInfo: nil, repeats: true)
+    workingTimerMenu()
   }
   
   @objc func workTimerTick() {
@@ -217,5 +219,33 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //    NSStatusBar.system.removeStatusItem(self.statusItem)
   }
 
+  @objc func menuStart() {
+    startWorkTimer()
+  }
+  
+  @objc func menuStop() {
+    stopWorkTimer()
+  }
+  
+  @objc func menuQuit() {
+    NSApplication.shared.terminate(nil)
+  }
+  
+  func initialTimerMenu() {
+    let menu = NSMenu()
+    menu.addItem(NSMenuItem(title: "Start Pomodoro", action: #selector(AppDelegate.menuStart), keyEquivalent: "S"))
+    menu.addItem(NSMenuItem.separator())
+    menu.addItem(NSMenuItem(title: "Quit", action: #selector(AppDelegate.menuQuit), keyEquivalent: "Q"))
+    statusItem.menu = menu
+  }
+  
+  func workingTimerMenu() {
+    let menu = NSMenu()
+    menu.addItem(NSMenuItem(title: "Stop Pomodoro", action: #selector(AppDelegate.menuStop), keyEquivalent: "S"))
+    menu.addItem(NSMenuItem.separator())
+    menu.addItem(NSMenuItem(title: "Quit", action: #selector(AppDelegate.menuQuit), keyEquivalent: "Q"))
+    statusItem.menu = menu
+  }
+  
 }
 
