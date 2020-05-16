@@ -370,6 +370,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func createSmallTimeMenu() -> NSMenu {
     let items: [item] = [
       item(value:3, selector: #selector(AppDelegate.onSmallTimeMenu)),
+      item(value:4, selector: #selector(AppDelegate.onSmallTimeMenu)),
       item(value:5, selector: #selector(AppDelegate.onSmallTimeMenu)),
       item(value:7, selector: #selector(AppDelegate.onSmallTimeMenu)),
       item(value:10, selector: #selector(AppDelegate.onSmallTimeMenu))]
