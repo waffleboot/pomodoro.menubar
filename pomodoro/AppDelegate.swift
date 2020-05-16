@@ -52,9 +52,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
   }
   
+  struct PomodoroNotification {
+    var when: Interval
+    var title: String
+  }
+  
   struct TimerSettings {
     var autostart: Bool
-    var notify: Interval
+    var notification: PomodoroNotification
     var sessions: Int
     var workTime: Interval
     var smallTime: Interval
@@ -63,7 +68,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   static let fastTimerSettings = TimerSettings(
     autostart: true,
-    notify: Interval(minutes: 0, seconds: 1),
+    notification: PomodoroNotification(when: Interval(minutes: 0, seconds: 1), title: "Last Second!"),
     sessions: 2,
     workTime: Interval(minutes: 0, seconds: 3),
     smallTime: Interval(minutes: 0, seconds: 3),
@@ -71,7 +76,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   static let debugTimerSettings = TimerSettings(
     autostart: true,
-    notify: Interval(minutes: 0, seconds: 5),
+    notification: PomodoroNotification(when: Interval(minutes: 0, seconds: 5), title: "Last Seconds!"),
     sessions: 2,
     workTime: Interval(minutes: 0, seconds: 10),
     smallTime: Interval(minutes: 0, seconds: 3),
@@ -79,7 +84,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   static let releaseTimerSettings = TimerSettings(
     autostart: false,
-    notify: Interval(minutes: 1, seconds: 0),
+    notification: PomodoroNotification(when: Interval(minutes: 1, seconds: 0), title: "Last Minute!"),
     sessions: 2,
     workTime: Interval(minutes: 25, seconds: 0),
     smallTime: Interval(minutes: 5, seconds: 0),
@@ -123,15 +128,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     if timerState.done {
       timer.invalidate()
       startRelaxTimer()
-    } else if timerState == timerSettings.notify {
+    } else if timerState == timerSettings.notification.when {
       notify()
     }
   }
   
   func notify() {
     let note = NSUserNotification()
-    note.title = "Pomodoro"
-    note.informativeText = "Ready!"
+    note.title = timerSettings.notification.title
+    note.informativeText = session >= timerSettings.sessions
+      ? "Almost time to take a long break!"
+      : "Almost time to take a short break!"
     NSUserNotificationCenter.default.deliver(note)
   }
   
@@ -329,7 +336,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   @objc func onNotifyMenu(_ sender: NSMenuItem) {
-    setAndUpdateMenu(sender.tag, .notifyMenuTag, notifyItems, { timerSettings.notify = $0 })
+    setAndUpdateMenu(sender.tag, .notifyMenuTag, notifyItems, { timerSettings.notification = $0 })
   }
   
   @objc func onSessionsMenu(_ sender: NSMenuItem) {
@@ -372,8 +379,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   let notifyItems = [
-    item(title: "30 сек", value: Interval(minutes: 0, seconds: 30)),
-    item(title: "1 мин", value: Interval(minutes: 1, seconds: 0))
+    item(title: "30 сек", value: PomodoroNotification(when: Interval(minutes: 0, seconds: 30), title: "Last Seconds!")),
+    item(title: "1 мин", value: PomodoroNotification(when: Interval(minutes: 1, seconds: 0), title: "Last Minute!"))
   ]
   
   let sessionItems = [
@@ -401,7 +408,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     item(title: "20 мин", value: Interval(minutes: 20, seconds: 0))]
   
   func createNotifyMenu() -> NSMenu {
-    return createItemsMenu(notifyItems, #selector(AppDelegate.onNotifyMenu)) { timerSettings.notify == $0 }
+    return createItemsMenu(notifyItems, #selector(AppDelegate.onNotifyMenu)) { timerSettings.notification.when == $0.when }
   }
   
   func createSessionsMenu() -> NSMenu {
