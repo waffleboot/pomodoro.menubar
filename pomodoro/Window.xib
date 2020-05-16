@@ -21,14 +21,14 @@
             <windowStyleMask key="styleMask" fullSizeContentView="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="480" height="270"/>
+            <rect key="contentRect" x="196" y="240" width="480" height="405"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
-                <autoresizingMask key="autoresizingMask"/>
+                <rect key="frame" x="0.0" y="0.0" width="480" height="405"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <button hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wHG-El-jew">
-                        <rect key="frame" x="14" y="222" width="81" height="32"/>
+                        <rect key="frame" x="14" y="357" width="81" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Quit" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6Mt-Sw-ifo">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -38,12 +38,11 @@
                             <action selector="exit:" target="-2" id="qkM-HK-zjC"/>
                         </connections>
                     </button>
-                    <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="32" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eEH-Dg-YcW" userLabel="panel">
-                        <rect key="frame" x="55" y="15" width="370" height="239"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                    <stackView distribution="fillEqually" orientation="vertical" alignment="centerX" spacing="32" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eEH-Dg-YcW" userLabel="panel">
+                        <rect key="frame" x="55" y="55" width="370" height="295"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EMt-UH-MQS" userLabel="messageLabel">
-                                <rect key="frame" x="-2" y="162" width="374" height="77"/>
+                                <rect key="frame" x="-2" y="218" width="374" height="77"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Take a break!" id="HDm-bU-k9E">
                                     <font key="font" metaFont="system" size="64"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -51,7 +50,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TCY-Fi-3he" userLabel="timerLabel">
-                                <rect key="frame" x="89" y="53" width="193" height="77"/>
+                                <rect key="frame" x="-2" y="109" width="374" height="77"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" alignment="center" title="mm:ss" id="6Td-U5-3Wo">
                                     <font key="font" metaFont="system" size="64"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -59,10 +58,10 @@
                                 </textFieldCell>
                             </textField>
                             <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GRd-ph-BVn" userLabel="buttons">
-                                <rect key="frame" x="124" y="0.0" width="122" height="21"/>
+                                <rect key="frame" x="0.0" y="0.0" width="370" height="77"/>
                                 <subviews>
-                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qcF-44-dSd" userLabel="stopButton">
-                                        <rect key="frame" x="-6" y="-7" width="69" height="32"/>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="qcF-44-dSd" userLabel="stopButton">
+                                        <rect key="frame" x="-6" y="-7" width="193" height="88"/>
                                         <buttonCell key="cell" type="push" title="Stop" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="sfa-1J-wvv">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -71,8 +70,8 @@
                                             <action selector="stop:" target="-2" id="DoK-mC-3c4"/>
                                         </connections>
                                     </button>
-                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sqZ-8M-b7E" userLabel="nextButton">
-                                        <rect key="frame" x="59" y="-7" width="69" height="32"/>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="sqZ-8M-b7E" userLabel="nextButton">
+                                        <rect key="frame" x="183" y="-7" width="193" height="88"/>
                                         <buttonCell key="cell" type="push" title="Next" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tg1-yR-jQx">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -82,6 +81,12 @@
                                         </connections>
                                     </button>
                                 </subviews>
+                                <constraints>
+                                    <constraint firstItem="sqZ-8M-b7E" firstAttribute="top" secondItem="GRd-ph-BVn" secondAttribute="top" id="AvF-P8-rKP"/>
+                                    <constraint firstItem="qcF-44-dSd" firstAttribute="top" secondItem="GRd-ph-BVn" secondAttribute="top" id="GxL-1s-E5h"/>
+                                    <constraint firstAttribute="bottom" secondItem="sqZ-8M-b7E" secondAttribute="bottom" id="c9n-Uu-xqy"/>
+                                    <constraint firstAttribute="bottom" secondItem="qcF-44-dSd" secondAttribute="bottom" id="nkE-vp-024"/>
+                                </constraints>
                                 <visibilityPriorities>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
@@ -92,6 +97,12 @@
                                 </customSpacing>
                             </stackView>
                         </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="GRd-ph-BVn" secondAttribute="trailing" id="BQl-2X-sSk"/>
+                            <constraint firstItem="TCY-Fi-3he" firstAttribute="leading" secondItem="eEH-Dg-YcW" secondAttribute="leading" id="Pvf-xd-LNu"/>
+                            <constraint firstItem="GRd-ph-BVn" firstAttribute="leading" secondItem="eEH-Dg-YcW" secondAttribute="leading" id="cNl-FH-Yjt"/>
+                            <constraint firstAttribute="trailing" secondItem="TCY-Fi-3he" secondAttribute="trailing" id="qpj-Ph-PGE"/>
+                        </constraints>
                         <visibilityPriorities>
                             <integer value="1000"/>
                             <integer value="1000"/>
@@ -104,11 +115,15 @@
                         </customSpacing>
                     </stackView>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="eEH-Dg-YcW" firstAttribute="centerY" secondItem="EiT-Mj-1SZ" secondAttribute="centerY" id="1qa-n7-6C9"/>
+                    <constraint firstItem="eEH-Dg-YcW" firstAttribute="centerX" secondItem="EiT-Mj-1SZ" secondAttribute="centerX" id="u0o-rT-PWA"/>
+                </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="3NC-6k-YVZ"/>
             </connections>
-            <point key="canvasLocation" x="-1440" y="126"/>
+            <point key="canvasLocation" x="-1440" y="193.5"/>
         </window>
     </objects>
 </document>
