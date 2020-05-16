@@ -3,7 +3,9 @@ import Cocoa
 
 class MyWindowController: NSWindowController, NSWindowDelegate {
   
-  @IBOutlet weak var label: NSTextField!
+  @IBOutlet weak var mmLabel: NSTextField!
+  @IBOutlet weak var ssLabel: NSTextField!
+  @IBOutlet weak var tickerView: NSView!
   @IBOutlet weak var nextButton: NSButton!
   @IBOutlet weak var messageLabel: NSTextField!
 
@@ -159,7 +161,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       timer.invalidate()
       ctrl.messageLabel.stringValue = "Back to work!"
       ctrl.nextButton.isHidden = false
-      ctrl.label.isHidden = true
+      ctrl.tickerView.isHidden = true
       timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.blink), userInfo: nil, repeats: true)
     } else {
       updateStatusBar(timerState)
@@ -212,7 +214,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func updateFullScreenWindow(_ time: Interval) {
-    ctrl.label.stringValue = String(format: "%02d:%02d", time.minutes, time.seconds)
+    ctrl.mmLabel.stringValue = String(format: "%02d", time.minutes)
+    ctrl.ssLabel.stringValue = String(format: "%02d", time.seconds)
   }
   
   func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -254,6 +257,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     self.timerSettings = settings
     if !running {
       timerInit()
+      if timerSettings.autostart {
+        startWorkTimer()
+      }
     }
   }
   
@@ -316,6 +322,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   @objc func onWorkTimeMenu(_ sender: NSMenuItem) {
     timerSettings.workTime.minutes = sender.tag
+    timerSettings.workTime.seconds = 0
     if !running {
       updateStatusBar(timerSettings.workTime)
     }
@@ -324,11 +331,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   @objc func onSmallTimeMenu(_ sender: NSMenuItem) {
     timerSettings.smallTime.minutes = sender.tag
+    timerSettings.smallTime.seconds = 0
     setAndUpdateMenu(sender.tag, AppDelegate.smallTimeMenuTag)
   }
 
   @objc func onLargeTimeMenu(_ sender: NSMenuItem) {
     timerSettings.largeTime.minutes = sender.tag
+    timerSettings.largeTime.seconds = 0
     setAndUpdateMenu(sender.tag, AppDelegate.largeTimeMenuTag)
   }
 
