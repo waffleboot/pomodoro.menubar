@@ -28,7 +28,7 @@ class MyWindowController: NSWindowController, NSWindowDelegate {
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
   
-  struct Interval: Equatable {
+  struct Interval: Equatable, Codable {
 
     var minutes: Int
     var seconds: Int
@@ -52,7 +52,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
   }
   
-  struct PomodoroNotification {
+  struct PomodoroNotification: Codable {
     var when: Interval
     var title: String
   }
@@ -226,6 +226,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func applicationDidFinishLaunching(_ aNotification: Notification) {
+    try? registerDefaults()
+    try? readDefaults()
     timerInit()
     if timerSettings.autostart {
       startWorkTimer()
@@ -336,26 +338,41 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   @objc func onNotifyMenu(_ sender: NSMenuItem) {
-    setAndUpdateMenu(sender.tag, .notifyMenuTag, notifyItems, { timerSettings.notification = $0 })
+    setAndUpdateMenu(sender.tag, .notifyMenuTag, notifyItems, {
+      timerSettings.notification = $0
+      try? updateDefaults()
+    })
   }
   
   @objc func onSessionsMenu(_ sender: NSMenuItem) {
-    setAndUpdateMenu(sender.tag, .sessionsMenuTag, sessionItems, { timerSettings.sessions = $0 })
+    setAndUpdateMenu(sender.tag, .sessionsMenuTag, sessionItems, {
+      timerSettings.sessions = $0
+      try? updateDefaults()
+    })
   }
   
   @objc func onWorkTimeMenu(_ sender: NSMenuItem) {
-    setAndUpdateMenu(sender.tag, .workTimeMenuTag, workTimeItems, { timerSettings.workTime = $0 })
+    setAndUpdateMenu(sender.tag, .workTimeMenuTag, workTimeItems, {
+      timerSettings.workTime = $0
+      try? updateDefaults()
+    })
     if !running {
       updateStatusBar(timerSettings.workTime)
     }
   }
   
   @objc func onSmallTimeMenu(_ sender: NSMenuItem) {
-    setAndUpdateMenu(sender.tag, .smallTimeMenuTag, smallTimeItems, { timerSettings.smallTime = $0 })
+    setAndUpdateMenu(sender.tag, .smallTimeMenuTag, smallTimeItems, {
+      timerSettings.smallTime = $0
+      try? updateDefaults()
+    })
   }
 
   @objc func onLargeTimeMenu(_ sender: NSMenuItem) {
-    setAndUpdateMenu(sender.tag, .largeTimeMenuTag, largeTimeItems, { timerSettings.largeTime = $0 })
+    setAndUpdateMenu(sender.tag, .largeTimeMenuTag, largeTimeItems, {
+      timerSettings.largeTime = $0
+      try? updateDefaults()
+    })
   }
 
   struct item<T> {
@@ -426,6 +443,41 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func createLargeTimeMenu() -> NSMenu {
     return createItemsMenu(largeTimeItems, #selector(AppDelegate.onLargeTimeMenu)) { timerSettings.largeTime == $0 }
   }
+
+  static let NotificationKey = "NotificationKey"
+  static let SessionsKey  = "SessionsKey"
+  static let WorkTimeKey  = "WorkTimeKey"
+  static let SmallTimeKey = "SmallTimeKey"
+  static let LargeTimeKey = "LargeTimeKey"
+
+  func registerDefaults() throws {
+    let encoder = JSONEncoder()
+    try UserDefaults.standard.register(defaults: [
+      AppDelegate.SessionsKey:  AppDelegate.releaseTimerSettings.sessions,
+      AppDelegate.WorkTimeKey:  encoder.encode(AppDelegate.releaseTimerSettings.workTime),
+      AppDelegate.SmallTimeKey: encoder.encode(AppDelegate.releaseTimerSettings.smallTime),
+      AppDelegate.LargeTimeKey: encoder.encode(AppDelegate.releaseTimerSettings.largeTime),
+      AppDelegate.NotificationKey : encoder.encode(AppDelegate.releaseTimerSettings.notification)
+    ])
+  }
+
+  func updateDefaults() throws {
+    let encoder = JSONEncoder()
+    UserDefaults.standard.set(timerSettings.sessions, forKey: AppDelegate.SessionsKey)
+    try UserDefaults.standard.set(encoder.encode(timerSettings.workTime), forKey: AppDelegate.WorkTimeKey)
+    try UserDefaults.standard.set(encoder.encode(timerSettings.smallTime), forKey: AppDelegate.SmallTimeKey)
+    try UserDefaults.standard.set(encoder.encode(timerSettings.largeTime), forKey: AppDelegate.LargeTimeKey)
+    try UserDefaults.standard.set(encoder.encode(timerSettings.notification), forKey: AppDelegate.NotificationKey)
+  }
   
+  func readDefaults() throws {
+    let decoder = JSONDecoder()
+    timerSettings.sessions = UserDefaults.standard.integer(forKey: AppDelegate.SessionsKey)
+    try timerSettings.workTime = decoder.decode(AppDelegate.Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.WorkTimeKey)!)
+    try timerSettings.smallTime = decoder.decode(AppDelegate.Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.SmallTimeKey)!)
+    try timerSettings.largeTime = decoder.decode(AppDelegate.Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.LargeTimeKey)!)
+    try timerSettings.notification = decoder.decode(AppDelegate.PomodoroNotification.self, from: UserDefaults.standard.data(forKey: AppDelegate.NotificationKey)!)
+  }
+
 }
 
