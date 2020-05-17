@@ -203,12 +203,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     ctrl.app = self
     let rect = NSScreen.main?.frame
     ctrl.window?.setFrame(rect!, display: false)
+    ctrl.window?.level = NSWindow.Level.init(NSWindow.Level.mainMenu.rawValue+2)
     ctrl.window?.backgroundColor = NSColor.black
     ctrl.nextButton.isHidden = true
   }
   
   func openFullScreenWindow() {
-    ctrl.window?.toggleFullScreen(nil)
+    ctrl.showWindow(nil)
   }
   
   func closeFullScreenWindow() {
