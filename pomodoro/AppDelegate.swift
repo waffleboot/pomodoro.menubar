@@ -64,6 +64,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var workTime: Interval
     var smallTime: Interval
     var largeTime: Interval
+    var autoClose: Bool
   }
 
   static let fastTimerSettings = TimerSettings(
@@ -72,7 +73,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     sessions: 2,
     workTime: Interval(minutes: 0, seconds: 3),
     smallTime: Interval(minutes: 0, seconds: 3),
-    largeTime: Interval(minutes: 0, seconds: 3))
+    largeTime: Interval(minutes: 0, seconds: 3),
+    autoClose: false)
   
   static let debugTimerSettings = TimerSettings(
     autostart: true,
@@ -80,7 +82,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     sessions: 2,
     workTime: Interval(minutes: 0, seconds: 10),
     smallTime: Interval(minutes: 0, seconds: 3),
-    largeTime: Interval(minutes: 0, seconds: 3))
+    largeTime: Interval(minutes: 0, seconds: 3),
+    autoClose: false)
   
   static let releaseTimerSettings = TimerSettings(
     autostart: false,
@@ -88,7 +91,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     sessions: 2,
     workTime: Interval(minutes: 25, seconds: 0),
     smallTime: Interval(minutes: 5, seconds: 0),
-    largeTime: Interval(minutes: 20, seconds: 0))
+    largeTime: Interval(minutes: 20, seconds: 0),
+    autoClose: false)
   
   var timerSettings = AppDelegate.releaseTimerSettings
 
@@ -165,11 +169,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   @objc func relaxTimerTick() {
     timerState.tick()
     if timerState.done {
-      timer.invalidate()
-      ctrl.messageLabel.stringValue = "Back to work!"
-      ctrl.nextButton.isHidden = false
-      ctrl.tickerView.isHidden = true
-      timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.blink), userInfo: nil, repeats: true)
+      if timerSettings.autoClose {
+        stopButtonPressed()
+      } else {
+        timer.invalidate()
+        ctrl.messageLabel.stringValue = "Back to work!"
+        ctrl.nextButton.isHidden = false
+        ctrl.tickerView.isHidden = true
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.blink), userInfo: nil, repeats: true)
+      }
     } else {
       updateStatusBar(timerState)
       updateFullScreenWindow(timerState)
@@ -188,8 +196,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func nextButtonPressed() {
     timer.invalidate()
     closeFullScreenWindow()
-    startWorkTimer()
-    workTimerTick()
+    startWorkTimerWithTick()
   }
   
   func stopButtonPressed() {
@@ -251,6 +258,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     NSApplication.shared.terminate(nil)
   }
   
+  @objc func onMenuAutoClose(_ sender: NSMenuItem) {
+    timerSettings.autoClose = !timerSettings.autoClose
+    sender.state = timerSettings.autoClose ? .on : .off
+    try? updateDefaults()
+  }
+  
   @objc func onMenuFast() {
     setPredefinedSettings(AppDelegate.fastTimerSettings)
   }
@@ -299,7 +312,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     largeTimeMenuTag
   }
   
-  
   func addSettingsMenuItems(_ menu: NSMenu) {
     menu.addItem(.separator())
     
@@ -315,6 +327,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     constructor("Work Time", .workTimeMenuTag, createWorkTimeMenu)
     constructor("Small Time", .smallTimeMenuTag, createSmallTimeMenu)
     constructor("Large Time", .largeTimeMenuTag, createLargeTimeMenu)
+
+    let submenu = NSMenuItem(title: "AutoClose", action: #selector(AppDelegate.onMenuAutoClose), keyEquivalent: "")
+    submenu.state = timerSettings.autoClose ? .on : .off
+    menu.addItem(submenu)
 
     menu.addItem(.separator())
     menu.addItem(NSMenuItem(title: "Fast Pomodoro", action: #selector(AppDelegate.onMenuFast), keyEquivalent: ""))
@@ -337,7 +353,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       }
     }
   }
-  
+
   @objc func onNotifyMenu(_ sender: NSMenuItem) {
     setAndUpdateMenu(sender.tag, .notifyMenuTag, notifyItems, {
       timerSettings.notification = $0
@@ -446,6 +462,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   static let NotificationKey = "NotificationKey"
+  static let AutoCloseKey = "AutoCloseKey"
   static let SessionsKey  = "SessionsKey"
   static let WorkTimeKey  = "WorkTimeKey"
   static let SmallTimeKey = "SmallTimeKey"
@@ -455,6 +472,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let encoder = JSONEncoder()
     try UserDefaults.standard.register(defaults: [
       AppDelegate.SessionsKey:  AppDelegate.releaseTimerSettings.sessions,
+      AppDelegate.AutoCloseKey: AppDelegate.releaseTimerSettings.autoClose,
       AppDelegate.WorkTimeKey:  encoder.encode(AppDelegate.releaseTimerSettings.workTime),
       AppDelegate.SmallTimeKey: encoder.encode(AppDelegate.releaseTimerSettings.smallTime),
       AppDelegate.LargeTimeKey: encoder.encode(AppDelegate.releaseTimerSettings.largeTime),
@@ -465,6 +483,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func updateDefaults() throws {
     let encoder = JSONEncoder()
     UserDefaults.standard.set(timerSettings.sessions, forKey: AppDelegate.SessionsKey)
+    UserDefaults.standard.set(timerSettings.autoClose, forKey: AppDelegate.AutoCloseKey)
     try UserDefaults.standard.set(encoder.encode(timerSettings.workTime), forKey: AppDelegate.WorkTimeKey)
     try UserDefaults.standard.set(encoder.encode(timerSettings.smallTime), forKey: AppDelegate.SmallTimeKey)
     try UserDefaults.standard.set(encoder.encode(timerSettings.largeTime), forKey: AppDelegate.LargeTimeKey)
@@ -474,6 +493,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func readDefaults() throws {
     let decoder = JSONDecoder()
     timerSettings.sessions = UserDefaults.standard.integer(forKey: AppDelegate.SessionsKey)
+    timerSettings.autoClose = UserDefaults.standard.bool(forKey: AppDelegate.AutoCloseKey)
     try timerSettings.workTime = decoder.decode(AppDelegate.Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.WorkTimeKey)!)
     try timerSettings.smallTime = decoder.decode(AppDelegate.Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.SmallTimeKey)!)
     try timerSettings.largeTime = decoder.decode(AppDelegate.Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.LargeTimeKey)!)
