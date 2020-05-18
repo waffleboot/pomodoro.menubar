@@ -151,13 +151,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     timerInit()
   }
   
-  func startRelaxTimer() {
+  func initRelaxTimer() {
     if session >= timerSettings.sessions {
       session = 0
-      timerState = timerSettings.largeTime
+      timerState = timerSettings.largeTime.done
+        ? timerSettings.smallTime
+        : timerSettings.largeTime
     } else {
       timerState = timerSettings.smallTime
     }
+  }
+
+  func startRelaxTimer() {
+    initRelaxTimer()
     createFullScreenWindow()
     updateStatusBar(timerState)
     updateFullScreenWindow(timerState)
@@ -414,6 +420,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   let notifyItems = [
     item(title: "30 сек", value: PomodoroNotification(when: Interval(minutes: 0, seconds: 30), title: "Last Seconds!")),
+    item(title: "45 сек", value: PomodoroNotification(when: Interval(minutes: 0, seconds: 45), title: "Last Seconds!")),
     item(title: "1 мин", value: PomodoroNotification(when: Interval(minutes: 1, seconds: 0), title: "Last Minute!"))
   ]
   
@@ -437,6 +444,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     item(title: "10 мин", value: Interval(minutes: 10, seconds: 0))]
   
   let largeTimeItems = [
+    item(title: "0 мин", value: Interval(minutes: 0, seconds: 0)),
     item(title: "10 мин", value: Interval(minutes: 10, seconds: 0)),
     item(title: "15 мин", value: Interval(minutes: 15, seconds: 0)),
     item(title: "20 мин", value: Interval(minutes: 20, seconds: 0))]
