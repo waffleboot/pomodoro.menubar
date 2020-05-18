@@ -191,7 +191,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   @objc func blink() {
-    ctrl.messageLabel.textColor = color ? NSColor.white : NSColor.red
+    ctrl.messageLabel.textColor = color ? NSColor.white : NSColor.yellow
     color = !color
   }
   
