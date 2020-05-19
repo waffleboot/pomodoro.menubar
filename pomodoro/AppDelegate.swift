@@ -59,18 +59,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var currentDate: Date?
     var previousDate: Date?
-    var currentValue = 0
-    var previousValue = 0
+    var currentMinutes  = 0
+    var previousMinutes = 0
 
-    mutating func update(_ value: Int) {
+    mutating func add(seconds: Int) {
       let date = Date()
-      if let b = currentDate, b == date {
-        currentValue += value
+      if let b = currentDate, Calendar.current.compare(b, to: date, toGranularity: .day) == .orderedSame {
+        currentMinutes += seconds/60
       } else {
-        previousDate  = currentDate
-        previousValue = currentValue
-        currentDate  = date
-        currentValue = value
+        (previousDate, currentDate) = (currentDate, date)
+        (previousMinutes, currentMinutes) = (currentMinutes, seconds/60)
       }
     }
 
@@ -102,9 +100,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   static let debugTimerSettings = TimerSettings(
     autostart: true,
-    notification: PomodoroNotification(when: Interval(minutes: 0, seconds: 5), title: "Last Seconds!"),
+    notification: PomodoroNotification(when: Interval(minutes: 0, seconds: 10), title: "Last Seconds!"),
     sessions: 2,
-    workTime: Interval(minutes: 0, seconds: 10),
+    workTime: Interval(minutes: 1, seconds: 10),
     smallTime: Interval(minutes: 0, seconds: 3),
     largeTime: Interval(minutes: 0, seconds: 3),
     autoClose: false)
@@ -158,7 +156,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     timerState.tick()
     updateStatusBar(timerState)
     if timerState.done {
-      stats.update(counter)
+      stats.add(seconds: counter)
       try? updateStats()
       timer.invalidate()
       startRelaxTimer()
@@ -179,7 +177,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   @objc func stopWorkTimer() {
     timer.invalidate()
     timerInit()
-    stats.update(counter)
+    stats.add(seconds: counter)
     try? updateStats()
   }
   
@@ -251,8 +249,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     ctrl.window?.level = NSWindow.Level.init(NSWindow.Level.mainMenu.rawValue+2)
     ctrl.window?.backgroundColor = NSColor.black
     ctrl.nextButton.isHidden = true
-    ctrl.currLabel.stringValue = String(format: "%02d:%02d", stats.currentValue/3600, stats.currentValue/60)
-    ctrl.prevLabel.stringValue = String(format: "%02d:%02d", stats.previousValue/3600, stats.previousValue/60)
+    ctrl.currLabel.stringValue = String(format: "%02d:%02d", stats.currentMinutes/60, stats.currentMinutes%60)
+    ctrl.prevLabel.stringValue = String(format: "%02d:%02d", stats.previousMinutes/60, stats.previousMinutes%60)
   }
   
   func openFullScreenWindow() {

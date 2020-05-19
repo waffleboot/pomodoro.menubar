@@ -41,10 +41,10 @@
                         </connections>
                     </button>
                     <stackView distribution="fillEqually" orientation="vertical" alignment="centerX" spacing="32" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eEH-Dg-YcW" userLabel="panel">
-                        <rect key="frame" x="301" y="124" width="370" height="290"/>
+                        <rect key="frame" x="301" y="105" width="370" height="327"/>
                         <subviews>
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EMt-UH-MQS" userLabel="messageLabel">
-                                <rect key="frame" x="-2" y="213" width="374" height="77"/>
+                                <rect key="frame" x="-2" y="250" width="374" height="77"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" alignment="center" title="Take a break!" id="HDm-bU-k9E">
                                     <font key="font" metaFont="system" size="64"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -52,28 +52,28 @@
                                 </textFieldCell>
                             </textField>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="b0H-Uz-ayR">
-                                <rect key="frame" x="0.0" y="104" width="370" height="77"/>
+                                <rect key="frame" x="0.0" y="104" width="370" height="114"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OxQ-f9-N4v">
-                                        <rect key="frame" x="68" y="0.0" width="111" height="77"/>
+                                        <rect key="frame" x="11" y="0.0" width="164" height="114"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" title="mm" id="Je9-jm-8a3">
-                                            <font key="font" metaFont="system" size="64"/>
+                                            <font key="font" metaFont="system" size="96"/>
                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jcJ-4k-jbj">
-                                        <rect key="frame" x="175" y="0.0" width="21" height="77"/>
+                                        <rect key="frame" x="171" y="0.0" width="29" height="114"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" title=":" id="siF-dj-M3C">
-                                            <font key="font" metaFont="system" size="64"/>
+                                            <font key="font" metaFont="system" size="96"/>
                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bJ0-pJ-70s">
-                                        <rect key="frame" x="192" y="0.0" width="66" height="77"/>
+                                        <rect key="frame" x="196" y="0.0" width="97" height="114"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" title="ss" id="W1I-Dn-xxw">
-                                            <font key="font" metaFont="system" size="64"/>
+                                            <font key="font" metaFont="system" size="96"/>
                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
