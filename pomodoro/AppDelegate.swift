@@ -470,7 +470,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     item(title: "20 мин", value: Interval(minutes: 20, seconds: 0)),
     item(title: "25 мин", value: Interval(minutes: 25, seconds: 0)),
     item(title: "30 мин", value: Interval(minutes: 30, seconds: 0)),
-    item(title: "40 мин", value: Interval(minutes: 40, seconds: 0))]
+    item(title: "35 мин", value: Interval(minutes: 35, seconds: 0)),
+    item(title: "40 мин", value: Interval(minutes: 40, seconds: 0)),
+    item(title: "45 мин", value: Interval(minutes: 45, seconds: 0)),
+    item(title: "50 мин", value: Interval(minutes: 50, seconds: 0)),
+    item(title: "55 мин", value: Interval(minutes: 55, seconds: 0)),
+    item(title: "60 мин", value: Interval(minutes: 60, seconds: 0))]
   
   let smallTimeItems = [
     item(title: "3 мин", value: Interval(minutes: 3, seconds: 0)),
