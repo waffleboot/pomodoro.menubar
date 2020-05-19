@@ -9,9 +9,11 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="MyWindowController" customModule="pomodoro" customModuleProvider="target">
             <connections>
+                <outlet property="currLabel" destination="Z4N-HY-aLd" id="PRd-q2-PrJ"/>
                 <outlet property="messageLabel" destination="EMt-UH-MQS" id="Oee-v6-Nc0"/>
                 <outlet property="mmLabel" destination="OxQ-f9-N4v" id="rbH-LL-MuT"/>
                 <outlet property="nextButton" destination="sqZ-8M-b7E" id="ydN-ab-EAe"/>
+                <outlet property="prevLabel" destination="Ljo-mn-pvv" id="yXB-1K-mF6"/>
                 <outlet property="ssLabel" destination="bJ0-pJ-70s" id="Wb6-5h-CD5"/>
                 <outlet property="tickerView" destination="b0H-Uz-ayR" id="zEp-8b-s6r"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="5Sg-i7-O85"/>
@@ -21,14 +23,14 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hasShadow="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="480" height="405"/>
+            <rect key="contentRect" x="196" y="240" width="971" height="537"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="480" height="405"/>
+                <rect key="frame" x="0.0" y="0.0" width="971" height="537"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <button hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wHG-El-jew">
-                        <rect key="frame" x="14" y="357" width="81" height="32"/>
+                        <rect key="frame" x="14" y="489" width="81" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Quit" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6Mt-Sw-ifo">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -39,7 +41,7 @@
                         </connections>
                     </button>
                     <stackView distribution="fillEqually" orientation="vertical" alignment="centerX" spacing="32" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eEH-Dg-YcW" userLabel="panel">
-                        <rect key="frame" x="55" y="58" width="370" height="290"/>
+                        <rect key="frame" x="301" y="124" width="370" height="290"/>
                         <subviews>
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EMt-UH-MQS" userLabel="messageLabel">
                                 <rect key="frame" x="-2" y="213" width="374" height="77"/>
@@ -148,16 +150,36 @@
                             <real value="3.4028234663852886e+38"/>
                         </customSpacing>
                     </stackView>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Z4N-HY-aLd">
+                        <rect key="frame" x="871" y="478" width="82" height="39"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="6XY-TL-dJW">
+                            <font key="font" metaFont="system" size="32"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ljo-mn-pvv">
+                        <rect key="frame" x="871" y="419" width="82" height="39"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="fWV-L2-4W3">
+                            <font key="font" metaFont="system" size="32"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                 </subviews>
                 <constraints>
                     <constraint firstItem="eEH-Dg-YcW" firstAttribute="centerY" secondItem="EiT-Mj-1SZ" secondAttribute="centerY" id="1qa-n7-6C9"/>
+                    <constraint firstItem="Z4N-HY-aLd" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="20" id="AcS-za-jt3"/>
+                    <constraint firstAttribute="trailing" secondItem="Ljo-mn-pvv" secondAttribute="trailing" constant="20" id="N7s-vl-V0h"/>
+                    <constraint firstItem="Ljo-mn-pvv" firstAttribute="top" secondItem="Z4N-HY-aLd" secondAttribute="bottom" constant="20" id="ZH2-Hl-TMq"/>
+                    <constraint firstAttribute="trailing" secondItem="Z4N-HY-aLd" secondAttribute="trailing" constant="20" id="hXh-RE-0D5"/>
                     <constraint firstItem="eEH-Dg-YcW" firstAttribute="centerX" secondItem="EiT-Mj-1SZ" secondAttribute="centerX" id="u0o-rT-PWA"/>
                 </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="3NC-6k-YVZ"/>
             </connections>
-            <point key="canvasLocation" x="-1440" y="193.5"/>
+            <point key="canvasLocation" x="-1194.5" y="259.5"/>
         </window>
     </objects>
 </document>

@@ -9,6 +9,9 @@ class MyWindowController: NSWindowController, NSWindowDelegate {
   @IBOutlet weak var nextButton: NSButton!
   @IBOutlet weak var messageLabel: NSTextField!
 
+  @IBOutlet weak var currLabel: NSTextField!
+  @IBOutlet weak var prevLabel: NSTextField!
+
   weak var app: AppDelegate!
   
   @IBAction func stop(_ sender: Any) {
@@ -52,6 +55,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
   }
   
+  struct Statistics: Codable {
+
+    var currentDate: Date?
+    var previousDate: Date?
+    var currentValue = 0
+    var previousValue = 0
+
+    mutating func update(_ value: Int) {
+      let date = Date()
+      if let b = currentDate, b == date {
+        currentValue += value
+      } else {
+        previousDate  = currentDate
+        previousValue = currentValue
+        currentDate  = date
+        currentValue = value
+      }
+    }
+
+  }
+
   struct PomodoroNotification: Codable {
     var when: Interval
     var title: String
@@ -104,6 +128,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   var color = false
   var running = false
   var timerState = Interval(minutes: 0, seconds: 0)
+  var counter = 0
+  var stats = Statistics()
   
   func timerInit() {
     running = false
@@ -118,6 +144,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func startWorkTimer() {
+    counter = 0
     session += 1
     running = true
     timerState = timerSettings.workTime
@@ -127,9 +154,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   @objc func workTimerTick() {
+    counter += 1
     timerState.tick()
     updateStatusBar(timerState)
     if timerState.done {
+      stats.update(counter)
+      try? updateStats()
       timer.invalidate()
       startRelaxTimer()
     } else if timerState == timerSettings.notification.when {
@@ -149,6 +179,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   @objc func stopWorkTimer() {
     timer.invalidate()
     timerInit()
+    stats.update(counter)
+    try? updateStats()
   }
   
   func initRelaxTimer() {
@@ -219,6 +251,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     ctrl.window?.level = NSWindow.Level.init(NSWindow.Level.mainMenu.rawValue+2)
     ctrl.window?.backgroundColor = NSColor.black
     ctrl.nextButton.isHidden = true
+    ctrl.currLabel.stringValue = String(format: "%02d:%02d", stats.currentValue/3600, stats.currentValue/60)
+    ctrl.prevLabel.stringValue = String(format: "%02d:%02d", stats.previousValue/3600, stats.previousValue/60)
   }
   
   func openFullScreenWindow() {
@@ -241,7 +275,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func applicationDidFinishLaunching(_ aNotification: Notification) {
     try? registerDefaults()
+    try? registerStats()
     try? readDefaults()
+    try? readStats()
     timerInit()
     if timerSettings.autostart {
       startWorkTimer()
@@ -475,6 +511,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   static let WorkTimeKey  = "WorkTimeKey"
   static let SmallTimeKey = "SmallTimeKey"
   static let LargeTimeKey = "LargeTimeKey"
+  static let StatsKey     = "StatsKey"
 
   func registerDefaults() throws {
     let encoder = JSONEncoder()
@@ -508,5 +545,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     try timerSettings.notification = decoder.decode(AppDelegate.PomodoroNotification.self, from: UserDefaults.standard.data(forKey: AppDelegate.NotificationKey)!)
   }
 
-}
+  func registerStats() throws {
+    let encoder = JSONEncoder()
+    try UserDefaults.standard.register(defaults: [
+      AppDelegate.StatsKey: encoder.encode(stats)
+      ])
+  }
 
+  func updateStats() throws {
+    let encoder = JSONEncoder()
+    try UserDefaults.standard.set(encoder.encode(stats), forKey: AppDelegate.StatsKey)
+  }
+
+  func readStats() throws {
+    let decoder = JSONDecoder()
+    try stats = decoder.decode(AppDelegate.Statistics.self, from: UserDefaults.standard.data(forKey: AppDelegate.StatsKey)!)
+  }
+
+}
