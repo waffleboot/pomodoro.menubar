@@ -49,7 +49,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       return lhs.minutes == rhs.minutes && lhs.seconds == rhs.seconds
     }
     
-    var done: Bool {
+    var zero: Bool {
       return minutes == 0 && seconds == 0
     }
     
@@ -155,7 +155,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     counter += 1
     timerState.tick()
     updateStatusBar(timerState)
-    if timerState.done {
+    if timerState.zero {
       stats.add(seconds: counter)
       try? updateStats()
       timer.invalidate()
@@ -168,7 +168,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func notify() {
     let note = NSUserNotification()
     note.title = timerSettings.notification.title
-    note.informativeText = session >= timerSettings.sessions
+    note.informativeText = session >= timerSettings.sessions && !timerSettings.largeTime.zero
       ? "Almost time to take a long break!"
       : "Almost time to take a short break!"
     NSUserNotificationCenter.default.deliver(note)
@@ -184,7 +184,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func initRelaxTimer() {
     if session >= timerSettings.sessions {
       session = 0
-      timerState = timerSettings.largeTime.done
+      timerState = timerSettings.largeTime.zero
         ? timerSettings.smallTime
         : timerSettings.largeTime
     } else {
@@ -204,7 +204,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   @objc func relaxTimerTick() {
     timerState.tick()
-    if timerState.done {
+    if timerState.zero {
       if timerSettings.autoClose {
         stopButtonPressed()
       } else {
