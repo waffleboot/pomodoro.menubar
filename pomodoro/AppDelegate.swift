@@ -1,6 +1,12 @@
 
 import Cocoa
 
+class MyWindow: NSWindow {
+  override var canBecomeKey: Bool {
+    return true
+  }
+}
+
 class MyWindowController: NSWindowController, NSWindowDelegate {
   
   @IBOutlet weak var mmLabel: NSTextField!
@@ -212,6 +218,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         ctrl.messageLabel.stringValue = "Back to work!"
         ctrl.nextButton.isHidden = false
         ctrl.tickerView.isHidden = true
+        ctrl.window?.makeFirstResponder(ctrl.nextButton)
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.blink), userInfo: nil, repeats: true)
       }
     } else {
