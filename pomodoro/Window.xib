@@ -41,10 +41,10 @@
                         </connections>
                     </button>
                     <stackView distribution="fillEqually" orientation="vertical" alignment="centerX" spacing="32" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eEH-Dg-YcW" userLabel="panel">
-                        <rect key="frame" x="301" y="105" width="370" height="327"/>
+                        <rect key="frame" x="301" y="103" width="370" height="332"/>
                         <subviews>
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EMt-UH-MQS" userLabel="messageLabel">
-                                <rect key="frame" x="-2" y="250" width="374" height="77"/>
+                                <rect key="frame" x="-2" y="255" width="374" height="77"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" alignment="center" title="Take a break!" id="HDm-bU-k9E">
                                     <font key="font" metaFont="system" size="64"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -52,7 +52,7 @@
                                 </textFieldCell>
                             </textField>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="b0H-Uz-ayR">
-                                <rect key="frame" x="0.0" y="104" width="370" height="114"/>
+                                <rect key="frame" x="0.0" y="109" width="370" height="114"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OxQ-f9-N4v">
                                         <rect key="frame" x="11" y="0.0" width="164" height="114"/>
@@ -92,11 +92,12 @@
                                 </constraints>
                             </customView>
                             <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="16" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GRd-ph-BVn" userLabel="buttons">
-                                <rect key="frame" x="17" y="0.0" width="336" height="72"/>
+                                <rect key="frame" x="17" y="0.0" width="336" height="77"/>
                                 <subviews>
-                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qcF-44-dSd" userLabel="stopButton">
-                                        <rect key="frame" x="-6" y="-7" width="172" height="83"/>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qcF-44-dSd" userLabel="stopButton" customClass="MyButton" customModule="pomodoro" customModuleProvider="target">
+                                        <rect key="frame" x="-6" y="-4" width="172" height="83"/>
                                         <constraints>
+                                            <constraint firstAttribute="height" constant="72" id="dSs-eC-Q22"/>
                                             <constraint firstAttribute="width" constant="160" id="zAO-Cr-AqB"/>
                                         </constraints>
                                         <buttonCell key="cell" type="push" title="Stop" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="sfa-1J-wvv">
@@ -108,12 +109,11 @@
                                             <outlet property="nextKeyView" destination="sqZ-8M-b7E" id="LmR-Wq-BWJ"/>
                                         </connections>
                                     </button>
-                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sqZ-8M-b7E" userLabel="nextButton">
-                                        <rect key="frame" x="170" y="-7" width="172" height="83"/>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sqZ-8M-b7E" userLabel="nextButton" customClass="MyButton" customModule="pomodoro" customModuleProvider="target">
+                                        <rect key="frame" x="170" y="-4" width="172" height="83"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="72" id="HBi-75-mgx"/>
                                             <constraint firstAttribute="width" constant="160" id="ejV-1q-4oZ"/>
-                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="72" id="vAR-KT-ZTC"/>
                                         </constraints>
                                         <buttonCell key="cell" type="push" title="Next" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tg1-yR-jQx">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -125,12 +125,6 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <constraints>
-                                    <constraint firstItem="sqZ-8M-b7E" firstAttribute="top" secondItem="GRd-ph-BVn" secondAttribute="top" id="AvF-P8-rKP"/>
-                                    <constraint firstItem="qcF-44-dSd" firstAttribute="top" secondItem="GRd-ph-BVn" secondAttribute="top" id="GxL-1s-E5h"/>
-                                    <constraint firstAttribute="bottom" secondItem="sqZ-8M-b7E" secondAttribute="bottom" id="c9n-Uu-xqy"/>
-                                    <constraint firstAttribute="bottom" secondItem="qcF-44-dSd" secondAttribute="bottom" id="nkE-vp-024"/>
-                                </constraints>
                                 <visibilityPriorities>
                                     <integer value="1000"/>
                                     <integer value="1000"/>

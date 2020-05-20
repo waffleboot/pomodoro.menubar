@@ -1,6 +1,15 @@
 
 import Cocoa
 
+class MyButton: NSButton {
+  override func drawFocusRingMask() {
+    NSBezierPath.fill(bounds)
+  }
+  override var focusRingMaskBounds: NSRect {
+    return bounds
+  }
+}
+
 class MyWindow: NSWindow {
   override var canBecomeKey: Bool {
     return true
