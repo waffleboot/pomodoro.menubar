@@ -262,6 +262,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func openFullScreenWindow() {
     ctrl.showWindow(nil)
+    NSApplication.shared.activate(ignoringOtherApps: true)
   }
   
   func closeFullScreenWindow() {
