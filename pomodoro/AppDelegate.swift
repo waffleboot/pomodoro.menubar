@@ -171,15 +171,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     timerState.tick()
     updateStatusBar(timerState)
     if timerState.zero {
-      stats.add(seconds: counter)
-      try? updateStats()
-      timer.invalidate()
+      workDone()
       startRelaxTimer()
     } else if timerState == timerSettings.notification.when {
       notify()
     }
   }
   
+  func workDone() {
+    stats.add(seconds: counter)
+    try? updateStats()
+    timer.invalidate()
+  }
+
   func notify() {
     let note = NSUserNotification()
     note.title = timerSettings.notification.title
@@ -311,6 +315,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     stopWorkTimer()
   }
   
+  @objc func onBreak() {
+    if running {
+      workDone()
+    }
+    startRelaxTimer()
+  }
+
   @objc func onMenuQuit() {
     NSApplication.shared.terminate(nil)
   }
@@ -346,6 +357,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func setPreWorkingMenu() {
     let menu = NSMenu()
     menu.addItem(NSMenuItem(title: "Start Pomodoro", action: #selector(AppDelegate.onMenuStart), keyEquivalent: "S"))
+    menu.addItem(NSMenuItem(title: "Start Break", action: #selector(AppDelegate.onBreak), keyEquivalent: ""))
     addSettingsMenuItems(menu)
     menu.addItem(.separator())
     menu.addItem(NSMenuItem(title: "Quit", action: #selector(AppDelegate.onMenuQuit), keyEquivalent: "Q"))
@@ -355,6 +367,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func setWorkingTimerMenu() {
     let menu = NSMenu()
     menu.addItem(NSMenuItem(title: "Stop Pomodoro", action: #selector(AppDelegate.onMenuStop), keyEquivalent: "S"))
+    menu.addItem(NSMenuItem(title: "Start Break", action: #selector(AppDelegate.onBreak), keyEquivalent: ""))
     addSettingsMenuItems(menu)
     menu.addItem(.separator())
     menu.addItem(NSMenuItem(title: "Quit", action: #selector(AppDelegate.onMenuQuit), keyEquivalent: "Q"))
