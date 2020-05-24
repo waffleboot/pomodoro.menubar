@@ -172,6 +172,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     updateStatusBar(timerState)
     if timerState.zero {
       workDone()
+      initRelaxTimer()
       startRelaxTimer()
     } else if timerState == timerSettings.notification.when {
       notify()
@@ -212,7 +213,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   func startRelaxTimer() {
-    initRelaxTimer()
     createFullScreenWindow()
     updateStatusBar(timerState)
     updateFullScreenWindow(timerState)
@@ -317,10 +317,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   @objc func onLongBreakMenu() {
     session = 0
+    timerState = timerSettings.largeTime
     onBreakMenu()
   }
 
   @objc func onShortBreakMenu() {
+    timerState = timerSettings.smallTime
     onBreakMenu()
   }
 
@@ -328,6 +330,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     if running {
       workDone()
     }
+    initRelaxTimer()
     startRelaxTimer()
   }
 
