@@ -315,7 +315,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     stopWorkTimer()
   }
   
-  @objc func onBreak() {
+  @objc func onLongBreakMenu() {
+    session = 0
+    onBreakMenu()
+  }
+
+  @objc func onShortBreakMenu() {
+    onBreakMenu()
+  }
+
+  func onBreakMenu() {
     if running {
       workDone()
     }
@@ -357,7 +366,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func setPreWorkingMenu() {
     let menu = NSMenu()
     menu.addItem(NSMenuItem(title: "Start Pomodoro", action: #selector(AppDelegate.onMenuStart), keyEquivalent: "S"))
-    menu.addItem(NSMenuItem(title: "Start Break", action: #selector(AppDelegate.onBreak), keyEquivalent: ""))
+    menu.addItem(NSMenuItem(title: "Short Break", action: #selector(AppDelegate.onShortBreakMenu), keyEquivalent: ""))
+    menu.addItem(NSMenuItem(title: "Long Break", action: #selector(AppDelegate.onLongBreakMenu), keyEquivalent: ""))
     addSettingsMenuItems(menu)
     menu.addItem(.separator())
     menu.addItem(NSMenuItem(title: "Quit", action: #selector(AppDelegate.onMenuQuit), keyEquivalent: "Q"))
@@ -367,7 +377,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func setWorkingTimerMenu() {
     let menu = NSMenu()
     menu.addItem(NSMenuItem(title: "Stop Pomodoro", action: #selector(AppDelegate.onMenuStop), keyEquivalent: "S"))
-    menu.addItem(NSMenuItem(title: "Start Break", action: #selector(AppDelegate.onBreak), keyEquivalent: ""))
+    menu.addItem(NSMenuItem(title: "Short Break", action: #selector(AppDelegate.onShortBreakMenu), keyEquivalent: ""))
+    menu.addItem(NSMenuItem(title: "Long Break", action: #selector(AppDelegate.onLongBreakMenu), keyEquivalent: ""))
     addSettingsMenuItems(menu)
     menu.addItem(.separator())
     menu.addItem(NSMenuItem(title: "Quit", action: #selector(AppDelegate.onMenuQuit), keyEquivalent: "Q"))
