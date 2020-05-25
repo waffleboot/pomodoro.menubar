@@ -332,7 +332,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     if running {
       workDone()
     }
-    initRelaxTimer()
     startRelaxTimer()
   }
 
