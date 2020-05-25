@@ -26,6 +26,7 @@ class MyWindowController: NSWindowController, NSWindowDelegate {
 
   @IBOutlet weak var currLabel: NSTextField!
   @IBOutlet weak var prevLabel: NSTextField!
+  @IBOutlet weak var sessionLabel: NSTextField!
 
   weak var app: AppDelegate!
   
@@ -271,6 +272,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     ctrl.nextButton.isHidden = true
     ctrl.currLabel.stringValue = String(format: "%02d:%02d", stats.currentMinutes/60, stats.currentMinutes%60)
     ctrl.prevLabel.stringValue = String(format: "%02d:%02d", stats.previousMinutes/60, stats.previousMinutes%60)
+    ctrl.sessionLabel.stringValue = "\(session)"
   }
   
   func openFullScreenWindow() {
