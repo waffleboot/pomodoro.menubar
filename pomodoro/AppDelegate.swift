@@ -273,6 +273,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     ctrl.currLabel.stringValue = String(format: "%02d:%02d", stats.currentMinutes/60, stats.currentMinutes%60)
     ctrl.prevLabel.stringValue = String(format: "%02d:%02d", stats.previousMinutes/60, stats.previousMinutes%60)
     ctrl.sessionLabel.stringValue = "\(session)"
+    ctrl.sessionLabel.isHidden = timerSettings.largeTime.zero
   }
   
   func openFullScreenWindow() {
@@ -410,8 +411,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     constructor("Notify", .notifyMenuTag, createNotifyMenu)
     constructor("Sessions", .sessionsMenuTag, createSessionsMenu)
     constructor("Work Time", .workTimeMenuTag, createWorkTimeMenu)
-    constructor("Small Time", .smallTimeMenuTag, createSmallTimeMenu)
-    constructor("Large Time", .largeTimeMenuTag, createLargeTimeMenu)
+    constructor("Short Break", .smallTimeMenuTag, createSmallTimeMenu)
+    constructor("Long Break", .largeTimeMenuTag, createLargeTimeMenu)
 
     let submenu = NSMenuItem(title: "AutoClose", action: #selector(AppDelegate.onMenuAutoClose), keyEquivalent: "")
     submenu.state = timerSettings.autoClose ? .on : .off
