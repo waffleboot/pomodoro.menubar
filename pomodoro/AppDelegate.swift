@@ -532,7 +532,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     item(title: "0 мин", value: Interval(minutes: 0, seconds: 0)),
     item(title: "10 мин", value: Interval(minutes: 10, seconds: 0)),
     item(title: "15 мин", value: Interval(minutes: 15, seconds: 0)),
-    item(title: "20 мин", value: Interval(minutes: 20, seconds: 0))]
+    item(title: "20 мин", value: Interval(minutes: 20, seconds: 0)),
+    item(title: "30 мин", value: Interval(minutes: 30, seconds: 0)),
+    item(title: "40 мин", value: Interval(minutes: 40, seconds: 0))]
   
   func createNotifyMenu() -> NSMenu {
     return createItemsMenu(notifyItems, #selector(AppDelegate.onNotifyMenu)) { timerSettings.notification.when == $0.when }
