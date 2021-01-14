@@ -272,7 +272,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     ctrl.nextButton.isHidden = true
     ctrl.currLabel.stringValue = String(format: "%02d:%02d", stats.currentMinutes/60, stats.currentMinutes%60)
     ctrl.prevLabel.stringValue = String(format: "%02d:%02d", stats.previousMinutes/60, stats.previousMinutes%60)
-    ctrl.sessionLabel.stringValue = "\(session)"
+    ctrl.sessionLabel.stringValue = "\(timerSettings.sessions - session)"
     ctrl.sessionLabel.isHidden = timerSettings.largeTime.zero
   }
   
@@ -499,16 +499,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   let notifyItems = [
+    item(title: "10 сек", value: PomodoroNotification(when: Interval(minutes: 0, seconds: 10), title: "Last Seconds!")),
+    item(title: "15 сек", value: PomodoroNotification(when: Interval(minutes: 0, seconds: 15), title: "Last Seconds!")),
     item(title: "30 сек", value: PomodoroNotification(when: Interval(minutes: 0, seconds: 30), title: "Last Seconds!")),
     item(title: "45 сек", value: PomodoroNotification(when: Interval(minutes: 0, seconds: 45), title: "Last Seconds!")),
-    item(title: "1 мин", value: PomodoroNotification(when: Interval(minutes: 1, seconds: 0), title: "Last Minute!"))
+    item(title: "1 мин",  value: PomodoroNotification(when: Interval(minutes: 1, seconds: 0),  title: "Last Minute!"))
   ]
   
   let sessionItems = [
     item(title: "2", value:2),
     item(title: "3", value:3),
     item(title: "4", value:4),
-    item(title: "5", value:5)]
+    item(title: "5", value:5),
+    item(title: "6", value:6)]
   
   let workTimeItems = [
     item(title: "20 мин", value: Interval(minutes: 20, seconds: 0)),
