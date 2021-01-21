@@ -340,6 +340,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     NSApplication.shared.terminate(nil)
   }
   
+  @objc func onMenuAutoStart(_ sender: NSMenuItem) {
+    timerSettings.autostart = !timerSettings.autostart
+    sender.state = timerSettings.autostart ? .on : .off
+    try? updateDefaults()
+  }
+
   @objc func onMenuAutoClose(_ sender: NSMenuItem) {
     timerSettings.autoClose = !timerSettings.autoClose
     sender.state = timerSettings.autoClose ? .on : .off
@@ -414,9 +420,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     constructor("Short Break", .smallTimeMenuTag, createSmallTimeMenu)
     constructor("Long Break", .largeTimeMenuTag, createLargeTimeMenu)
 
-    let submenu = NSMenuItem(title: "AutoClose", action: #selector(AppDelegate.onMenuAutoClose), keyEquivalent: "")
-    submenu.state = timerSettings.autoClose ? .on : .off
-    menu.addItem(submenu)
+    let submenu1 = NSMenuItem(title: "AutoClose", action: #selector(AppDelegate.onMenuAutoClose), keyEquivalent: "")
+    submenu1.state = timerSettings.autoClose ? .on : .off
+    menu.addItem(submenu1)
+
+    let submenu2 = NSMenuItem(title: "AutoStart", action: #selector(AppDelegate.onMenuAutoStart), keyEquivalent: "")
+    submenu2.state = timerSettings.autostart ? .on : .off
+    menu.addItem(submenu2)
 
     menu.addItem(.separator())
     menu.addItem(NSMenuItem(title: "Fast Pomodoro", action: #selector(AppDelegate.onMenuFast), keyEquivalent: ""))
@@ -561,6 +571,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   static let NotificationKey = "NotificationKey"
   static let AutoCloseKey = "AutoCloseKey"
+  static let AutoStartKey = "AutoStartKey"
   static let SessionsKey  = "SessionsKey"
   static let WorkTimeKey  = "WorkTimeKey"
   static let SmallTimeKey = "SmallTimeKey"
@@ -572,6 +583,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     try UserDefaults.standard.register(defaults: [
       AppDelegate.SessionsKey:  AppDelegate.releaseTimerSettings.sessions,
       AppDelegate.AutoCloseKey: AppDelegate.releaseTimerSettings.autoClose,
+      AppDelegate.AutoStartKey: AppDelegate.releaseTimerSettings.autostart,
       AppDelegate.WorkTimeKey:  encoder.encode(AppDelegate.releaseTimerSettings.workTime),
       AppDelegate.SmallTimeKey: encoder.encode(AppDelegate.releaseTimerSettings.smallTime),
       AppDelegate.LargeTimeKey: encoder.encode(AppDelegate.releaseTimerSettings.largeTime),
@@ -583,6 +595,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let encoder = JSONEncoder()
     UserDefaults.standard.set(timerSettings.sessions, forKey: AppDelegate.SessionsKey)
     UserDefaults.standard.set(timerSettings.autoClose, forKey: AppDelegate.AutoCloseKey)
+    UserDefaults.standard.set(timerSettings.autostart, forKey: AppDelegate.AutoStartKey)
     try UserDefaults.standard.set(encoder.encode(timerSettings.workTime), forKey: AppDelegate.WorkTimeKey)
     try UserDefaults.standard.set(encoder.encode(timerSettings.smallTime), forKey: AppDelegate.SmallTimeKey)
     try UserDefaults.standard.set(encoder.encode(timerSettings.largeTime), forKey: AppDelegate.LargeTimeKey)
@@ -593,6 +606,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let decoder = JSONDecoder()
     timerSettings.sessions = UserDefaults.standard.integer(forKey: AppDelegate.SessionsKey)
     timerSettings.autoClose = UserDefaults.standard.bool(forKey: AppDelegate.AutoCloseKey)
+    timerSettings.autostart = UserDefaults.standard.bool(forKey: AppDelegate.AutoStartKey)
     try timerSettings.workTime = decoder.decode(AppDelegate.Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.WorkTimeKey)!)
     try timerSettings.smallTime = decoder.decode(AppDelegate.Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.SmallTimeKey)!)
     try timerSettings.largeTime = decoder.decode(AppDelegate.Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.LargeTimeKey)!)
