@@ -96,6 +96,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   struct TimerSettings {
+    var debug: Bool
     var autostart: Bool
     var notification: PomodoroNotification
     var sessions: Int
@@ -106,15 +107,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   static let fastTimerSettings = TimerSettings(
+    debug: true,
     autostart: true,
     notification: PomodoroNotification(when: Interval(minutes: 0, seconds: 1), title: "Last Second!"),
     sessions: 2,
     workTime: Interval(minutes: 0, seconds: 3),
     smallTime: Interval(minutes: 0, seconds: 3),
-    largeTime: Interval(minutes: 0, seconds: 3),
+    largeTime: Interval(minutes: 0, seconds: 5),
     autoClose: false)
   
   static let debugTimerSettings = TimerSettings(
+    debug: true,
     autostart: true,
     notification: PomodoroNotification(when: Interval(minutes: 0, seconds: 10), title: "Last Seconds!"),
     sessions: 2,
@@ -124,6 +127,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     autoClose: false)
   
   static let releaseTimerSettings = TimerSettings(
+    debug: true,
     autostart: false,
     notification: PomodoroNotification(when: Interval(minutes: 1, seconds: 0), title: "Last Minute!"),
     sessions: 2,
@@ -260,6 +264,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     timer.invalidate()
     timerInit()
     closeFullScreenWindow()
+    if timerSettings.autostart && !timerSettings.autoClose {
+      startWorkTimerWithTick()
+    }
   }
   
   func createFullScreenWindow() {
@@ -317,22 +324,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   @objc func onMenuStop() {
     stopWorkTimer()
   }
-  
-  @objc func onLongBreakMenu() {
-    session = 0
-    timerState = timerSettings.largeTime
-    onBreakMenu()
-  }
 
-  @objc func onShortBreakMenu() {
-    timerState = timerSettings.smallTime
-    onBreakMenu()
-  }
-
-  func onBreakMenu() {
+  @objc func onBreakMenu() {
     if running {
       workDone()
     }
+    initRelaxTimer()
     startRelaxTimer()
   }
 
@@ -377,8 +374,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func setPreWorkingMenu() {
     let menu = NSMenu()
     menu.addItem(NSMenuItem(title: "Start Pomodoro", action: #selector(AppDelegate.onMenuStart), keyEquivalent: "S"))
-    menu.addItem(NSMenuItem(title: "Short Break", action: #selector(AppDelegate.onShortBreakMenu), keyEquivalent: ""))
-    menu.addItem(NSMenuItem(title: "Long Break", action: #selector(AppDelegate.onLongBreakMenu), keyEquivalent: ""))
+    menu.addItem(NSMenuItem(title: "Start Break", action: #selector(AppDelegate.onBreakMenu), keyEquivalent: ""))
     addSettingsMenuItems(menu)
     menu.addItem(.separator())
     menu.addItem(NSMenuItem(title: "Quit", action: #selector(AppDelegate.onMenuQuit), keyEquivalent: "Q"))
@@ -388,8 +384,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func setWorkingTimerMenu() {
     let menu = NSMenu()
     menu.addItem(NSMenuItem(title: "Stop Pomodoro", action: #selector(AppDelegate.onMenuStop), keyEquivalent: "S"))
-    menu.addItem(NSMenuItem(title: "Short Break", action: #selector(AppDelegate.onShortBreakMenu), keyEquivalent: ""))
-    menu.addItem(NSMenuItem(title: "Long Break", action: #selector(AppDelegate.onLongBreakMenu), keyEquivalent: ""))
+    menu.addItem(NSMenuItem(title: "Start Break", action: #selector(AppDelegate.onBreakMenu), keyEquivalent: ""))
     addSettingsMenuItems(menu)
     menu.addItem(.separator())
     menu.addItem(NSMenuItem(title: "Quit", action: #selector(AppDelegate.onMenuQuit), keyEquivalent: "Q"))
@@ -592,6 +587,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   func updateDefaults() throws {
+    if timerSettings.debug { return }
     let encoder = JSONEncoder()
     UserDefaults.standard.set(timerSettings.sessions, forKey: AppDelegate.SessionsKey)
     UserDefaults.standard.set(timerSettings.autoClose, forKey: AppDelegate.AutoCloseKey)
@@ -604,6 +600,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func readDefaults() throws {
     let decoder = JSONDecoder()
+    timerSettings.debug = false
     timerSettings.sessions = UserDefaults.standard.integer(forKey: AppDelegate.SessionsKey)
     timerSettings.autoClose = UserDefaults.standard.bool(forKey: AppDelegate.AutoCloseKey)
     timerSettings.autostart = UserDefaults.standard.bool(forKey: AppDelegate.AutoStartKey)
