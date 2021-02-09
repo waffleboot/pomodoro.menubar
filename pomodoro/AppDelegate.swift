@@ -264,9 +264,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     timer.invalidate()
     timerInit()
     closeFullScreenWindow()
-    if timerSettings.autostart && !timerSettings.autoClose {
-      startWorkTimerWithTick()
-    }
   }
   
   func createFullScreenWindow() {
