@@ -167,6 +167,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func startWorkTimer() {
+    if session >= timerSettings.sessions {
+      session = 0
+    }
     session += 1
     startWorkTimerWithTime(timerSettings.workTime)
   }
@@ -217,7 +220,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func initRelaxTimer() {
     if session >= timerSettings.sessions {
-      session = 0
       timerState = timerSettings.largeTime.zero
         ? timerSettings.smallTime
         : timerSettings.largeTime
@@ -377,11 +379,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func setPredefinedSettings(_ settings: TimerSettings) {
     self.timerSettings = settings
-    if !running {
-      timerInit()
-      if timerSettings.autostart {
-        startWorkTimer()
-      }
+    if running {
+      stopWorkTimer()
+    }
+    session = 0
+    timerInit()
+    if timerSettings.autostart {
+      startWorkTimer()
     }
   }
   
