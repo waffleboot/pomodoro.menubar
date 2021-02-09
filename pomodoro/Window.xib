@@ -9,6 +9,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="MyWindowController" customModule="pomodoro" customModuleProvider="target">
             <connections>
+                <outlet property="addButton" destination="UX7-Hg-7SZ" id="D59-z0-LCa"/>
                 <outlet property="currLabel" destination="Z4N-HY-aLd" id="PRd-q2-PrJ"/>
                 <outlet property="messageLabel" destination="EMt-UH-MQS" id="Oee-v6-Nc0"/>
                 <outlet property="mmLabel" destination="OxQ-f9-N4v" id="rbH-LL-MuT"/>
@@ -42,10 +43,10 @@
                         </connections>
                     </button>
                     <stackView distribution="fillEqually" orientation="vertical" alignment="centerX" spacing="32" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eEH-Dg-YcW" userLabel="panel">
-                        <rect key="frame" x="301" y="103" width="370" height="332"/>
+                        <rect key="frame" x="230" y="103" width="512" height="332"/>
                         <subviews>
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EMt-UH-MQS" userLabel="messageLabel">
-                                <rect key="frame" x="-2" y="255" width="374" height="77"/>
+                                <rect key="frame" x="69" y="255" width="374" height="77"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" alignment="center" title="Take a break!" id="HDm-bU-k9E">
                                     <font key="font" metaFont="system" size="64"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -53,7 +54,7 @@
                                 </textFieldCell>
                             </textField>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="b0H-Uz-ayR">
-                                <rect key="frame" x="0.0" y="109" width="370" height="114"/>
+                                <rect key="frame" x="71" y="109" width="370" height="114"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OxQ-f9-N4v">
                                         <rect key="frame" x="11" y="0.0" width="164" height="114"/>
@@ -93,7 +94,7 @@
                                 </constraints>
                             </customView>
                             <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="16" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GRd-ph-BVn" userLabel="buttons">
-                                <rect key="frame" x="17" y="0.0" width="336" height="77"/>
+                                <rect key="frame" x="0.0" y="0.0" width="512" height="77"/>
                                 <subviews>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qcF-44-dSd" userLabel="stopButton" customClass="MyButton" customModule="pomodoro" customModuleProvider="target">
                                         <rect key="frame" x="-6" y="-4" width="172" height="83"/>
@@ -110,8 +111,23 @@
                                             <outlet property="nextKeyView" destination="sqZ-8M-b7E" id="LmR-Wq-BWJ"/>
                                         </connections>
                                     </button>
-                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sqZ-8M-b7E" userLabel="nextButton" customClass="MyButton" customModule="pomodoro" customModuleProvider="target">
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UX7-Hg-7SZ" userLabel="addButton" customClass="MyButton" customModule="pomodoro" customModuleProvider="target">
                                         <rect key="frame" x="170" y="-4" width="172" height="83"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="72" id="751-9x-pM5"/>
+                                            <constraint firstAttribute="width" constant="160" id="RPe-Wz-0cp"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="push" title="1 min" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Pce-5f-xZX">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system" size="32"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="add:" target="-2" id="QPJ-jx-Jij"/>
+                                            <outlet property="nextKeyView" destination="sqZ-8M-b7E" id="Tcu-5t-J3P"/>
+                                        </connections>
+                                    </button>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sqZ-8M-b7E" userLabel="nextButton" customClass="MyButton" customModule="pomodoro" customModuleProvider="target">
+                                        <rect key="frame" x="346" y="-4" width="172" height="83"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="72" id="HBi-75-mgx"/>
                                             <constraint firstAttribute="width" constant="160" id="ejV-1q-4oZ"/>
@@ -129,8 +145,10 @@
                                 <visibilityPriorities>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
+                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                 </customSpacing>
@@ -185,7 +203,7 @@
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="3NC-6k-YVZ"/>
-                <outlet property="initialFirstResponder" destination="qcF-44-dSd" id="wXJ-Kd-F8R"/>
+                <outlet property="initialFirstResponder" destination="UX7-Hg-7SZ" id="4Fm-9g-19h"/>
             </connections>
             <point key="canvasLocation" x="-1194.5" y="259.5"/>
         </window>

@@ -22,6 +22,7 @@ class MyWindowController: NSWindowController, NSWindowDelegate {
   @IBOutlet weak var ssLabel: NSTextField!
   @IBOutlet weak var tickerView: NSView!
   @IBOutlet weak var nextButton: NSButton!
+  @IBOutlet weak var addButton:  NSButton!
   @IBOutlet weak var messageLabel: NSTextField!
 
   @IBOutlet weak var currLabel: NSTextField!
@@ -34,6 +35,10 @@ class MyWindowController: NSWindowController, NSWindowDelegate {
     app.stopButtonPressed()
   }
   
+  @IBAction func add(_ sender: Any) {
+    app.addButtonPressed()
+  }
+
   @IBAction func next(_ sender: Any) {
     app.nextButtonPressed()
   }
@@ -111,9 +116,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     autostart: true,
     notification: PomodoroNotification(when: Interval(minutes: 0, seconds: 1), title: "Last Second!"),
     sessions: 2,
-    workTime: Interval(minutes: 0, seconds: 3),
+    workTime: Interval(minutes: 0, seconds: 4),
     smallTime: Interval(minutes: 0, seconds: 3),
-    largeTime: Interval(minutes: 0, seconds: 5),
+    largeTime: Interval(minutes: 0, seconds: 7),
     autoClose: false)
   
   static let debugTimerSettings = TimerSettings(
@@ -162,10 +167,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func startWorkTimer() {
-    counter = 0
     session += 1
+    startWorkTimerWithTime(timerSettings.workTime)
+  }
+
+  func startWorkTimerWithTime(_ time: Interval) {
+    counter = 0
     running = true
-    timerState = timerSettings.workTime
+    timerState = time
     statusItem.action = #selector(AppDelegate.stopWorkTimer)
     timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.workTimerTick), userInfo: nil, repeats: true)
     setWorkingTimerMenu()
@@ -234,6 +243,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       } else {
         timer.invalidate()
         ctrl.messageLabel.stringValue = "Back to work!"
+        ctrl.addButton.isHidden  = true
         ctrl.nextButton.isHidden = false
         ctrl.tickerView.isHidden = true
         ctrl.window?.makeFirstResponder(ctrl.nextButton)
@@ -260,6 +270,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     startWorkTimerWithTick()
   }
   
+  func addButtonPressed() {
+    timer.invalidate()
+    closeFullScreenWindow()
+    startWorkTimerWithTime(Interval(minutes: 1, seconds: 0))
+    workTimerTick()
+  }
+
   func stopButtonPressed() {
     timer.invalidate()
     timerInit()
