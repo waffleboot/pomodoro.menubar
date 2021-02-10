@@ -177,27 +177,51 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     switch state {
     case .running:
       switch e {
-      case .tick: workTimerTick()
-      case .done: workDone(); z3()
-      case .menu1: stopWorkTimer(); z4()
-      case .notify: notify()
+      case .tick:
+        workTimerTick()
+      case .done:
+        workDone()
+        startRelax()
+        startTimer()
+        state = .relaxing
+      case .menu1:
+        stopWorkTimer()
+        z4()
+      case .notify:
+        notify()
       default: break
       }
     case .stopped:
       switch e {
-      case .done: z3()
-      case .menu1: z4()
-      case .menu2: updateStatusBar(timerSettings.workTime)
+      case .done:
+        startRelax()
+        startTimer()
+        state = .relaxing
+      case .menu1:
+        z4()
+      case .menu2:
+        updateStatusBar(timerSettings.workTime)
       default: break
       }
     case .relaxing:
       switch e {
-      case .tick: relaxTimerTick()
+      case .tick:
+        relaxTimerTick()
+      case .done:
+        if timerSettings.autoClose {
+          stopButtonPressed()
+        } else {
+          stopTimer()
+          backToWork()
+          startTimer()
+          state = .waiting
+        }
       default: break
       }
     case .waiting:
       switch e {
-      case .tick: blink()
+      case .tick:
+        blink()
       default: break
       }
     }
@@ -207,7 +231,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     state = .stopped
     setPreWorkingMenu()
     updateStatusBar(timerSettings.workTime)
-    statusItem.action = #selector(AppDelegate.startWorkTimerWithTick)
   }
   
   @objc func startWorkTimerWithTick() {
@@ -227,16 +250,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     seconds = 0
     state = .running
     timerState = time
-    statusItem.action = #selector(AppDelegate.stopWorkTimer)
     timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.tick), userInfo: nil, repeats: true)
     setWorkingTimerMenu()
   }
   
-  func z3() {
-    initRelaxTimer()
-    startRelaxTimer()
-  }
-
   @objc func workTimerTick() {
     seconds += 1
     timerState.tick()
@@ -251,7 +268,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func workDone() {
     stats.add(seconds: seconds)
     try? updateStats()
-    timer.invalidate()
+    stopTimer()
   }
 
   func notify() {
@@ -264,7 +281,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   @objc func stopWorkTimer() {
-    timer.invalidate()
+    stopTimer()
     timerInit()
     stats.add(seconds: seconds)
     try? updateStats()
@@ -280,31 +297,34 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
   }
 
-  func startRelaxTimer() {
+  func startRelax() {
+    initRelaxTimer()
     createFullScreenWindow()
     updateStatusBar(timerState)
     updateFullScreenWindow(timerState)
     openFullScreenWindow()
-    statusItem.action = #selector(AppDelegate.stopRelaxTimer)
-    state = .relaxing
+  }
+
+  func backToWork() {
+    ctrl.messageLabel.stringValue = "Back to work!"
+    ctrl.addButton.isHidden  = true
+    ctrl.nextButton.isHidden = false
+    ctrl.tickerView.isHidden = true
+    ctrl.window?.makeFirstResponder(ctrl.nextButton)
+  }
+
+  func startTimer() {
     timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.tick), userInfo: nil, repeats: true)
+  }
+
+  func stopTimer() {
+    timer.invalidate()
   }
 
   @objc func relaxTimerTick() {
     timerState.tick()
     if timerState.zero {
-      if timerSettings.autoClose {
-        stopButtonPressed()
-      } else {
-        timer.invalidate()
-        ctrl.messageLabel.stringValue = "Back to work!"
-        ctrl.addButton.isHidden  = true
-        ctrl.nextButton.isHidden = false
-        ctrl.tickerView.isHidden = true
-        ctrl.window?.makeFirstResponder(ctrl.nextButton)
-        state = .waiting
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.tick), userInfo: nil, repeats: true)
-      }
+      automata(.done)
     } else {
       updateStatusBar(timerState)
       updateFullScreenWindow(timerState)
@@ -321,20 +341,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func nextButtonPressed() {
-    timer.invalidate()
+    stopTimer()
     closeFullScreenWindow()
     startWorkTimerWithTick()
   }
   
   func addButtonPressed() {
-    timer.invalidate()
+    stopTimer()
     closeFullScreenWindow()
     startWorkTimerWithTime(Interval(minutes: 1, seconds: 0))
     workTimerTick()
   }
 
   func stopButtonPressed() {
-    timer.invalidate()
+    stopTimer()
     timerInit()
     closeFullScreenWindow()
   }
