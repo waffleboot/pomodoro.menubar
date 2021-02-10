@@ -174,11 +174,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     case .running:
       switch e {
       case .tick: workTimerTick()
+      case .done: workDone(); z3()
       case .notify: notify()
-      case .done: z1()
+      }
+    case .stopped:
+      switch e {
+      case .done: z3()
       default: break
       }
-    default: break
     }
   }
 
@@ -211,12 +214,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     setWorkingTimerMenu()
   }
   
-  func z1() {
-    workDone()
-    z2()
-  }
-
-  func z2() {
+  func z3() {
     initRelaxTimer()
     startRelaxTimer()
   }
@@ -378,10 +376,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   @objc func onBreakMenu() {
-    if state == .running {
-      workDone()
-    }
-    z2()
+    automata(.done)
   }
 
   @objc func onMenuQuit() {
