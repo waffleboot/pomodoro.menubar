@@ -13,7 +13,6 @@ enum Event {
   case done
   case menuSetPredefined
   case menuWorkTimeUpdate
-  case notify
 }
 
 class MyButton: NSButton {
@@ -107,6 +106,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       switch e {
       case .tick:
         workTimerTick()
+        if timerState.zero {
+          automata(.done)
+        } else if timerState == timerSettings.notification.when {
+          notify()
+        }
       case .done:
         stopTimer()
         workDone()
@@ -116,8 +120,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       case .menuSetPredefined:
         stopWorkTimer()
         z4()
-      case .notify:
-        notify()
       default: break
       }
     case .stopped:
@@ -164,7 +166,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   @objc func startWorkTimerWithTick() {
     startWorkTimer()
-    workTimerTick()
+    tick()
   }
   
   func startWorkTimer() {
@@ -182,11 +184,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func workTimerTick() {
     timerState.tick()
     updateStatusBar(timerState)
-    if timerState.zero {
-      automata(.done)
-    } else if timerState == timerSettings.notification.when {
-      automata(.notify)
-    }
   }
   
   func workDone() {
@@ -268,7 +265,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     stopTimer()
     closeFullScreenWindow()
     startWorkTimerWithTime(Interval(minutes: 1, seconds: 0))
-    workTimerTick()
+    tick()
   }
 
   func stopButtonPressed() {
