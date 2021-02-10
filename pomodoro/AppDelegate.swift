@@ -1,16 +1,27 @@
 
 import Cocoa
 
-enum State {
+enum State0 {
+  case state1
+  case state2
+}
+
+enum State1 {
   case stopped
   case running
+}
+
+enum State2 {
   case relaxing
   case waiting
 }
 
 enum Event {
+  case end
+  case jump
   case tick
   case done
+  case close
   case menuSetPredefined
   case menuWorkTimeUpdate
 }
@@ -91,7 +102,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   var session = 0
   var color = false
-  var state = State.stopped
+  var state1 = State1.stopped
+  var state0 = State0.state1
+  var state2: State2!
+
   var timerState = Interval(minutes: 0, seconds: 0)
   var timerSettings = TimerSettings.releaseTimerSettings
   var stats = Statistics()
@@ -100,66 +114,107 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     automata(.tick)
   }
 
-  func automata(_ e: Event) {
-    switch state {
+  func automata(_ e : Event) {
+    switch state0 {
+    case .state1:
+      if automata1(e) {
+        state0 = .state2
+        automata(.jump)
+      }
+    case .state2:
+      if automata2(e) {
+        state0 = .state1
+        automata(.jump)
+      }
+    }
+  }
+
+  func automata2(_ e: Event) -> Bool {
+    if e == .jump {
+      openRelaxWindow()
+      startTimer()
+      state2 = .relaxing
+    } else if e == .end {
+      stopTimer()
+      closeFullScreenWindow()
+      return true
+    }
+    switch state2 {
+    case .relaxing:
+      switch e {
+      case .tick:
+        relaxTimerTick()
+        if timerState.zero {
+          return automata2(.done)
+        } else {
+          updateStatusBar(timerState)
+          updateFullScreenWindow(timerState)
+        }
+      case .close:
+        return automata2(.end)
+      case .done:
+        if timerSettings.autoClose {
+          return automata2(.close)
+        } else {
+          backToWork()
+          state2 = .waiting
+        }
+      default: break
+    }
+    case .waiting:
+      switch e {
+      case .close:
+        return automata2(.end)
+      case .tick:
+        blink()
+      default: break
+      }
+    default: break
+    }
+    return false
+  }
+
+  func automata1(_ e: Event) -> Bool {
+    if e == .jump {
+      timerInit()
+    } else if e == .end {
+      return true
+    }
+    switch state1 {
     case .running:
       switch e {
       case .tick:
         workTimerTick()
         if timerState.zero {
-          automata(.done)
+          return automata1(.done)
         } else if timerState == timerSettings.notification.when {
           notify()
         }
       case .done:
         stopTimer()
         workDone()
-        openRelaxWindow()
-        startTimer()
-        state = .relaxing
+        return automata1(.end)
       case .menuSetPredefined:
         stopWorkTimer()
-        z4()
+        resetWorkTimer()
       default: break
       }
     case .stopped:
       switch e {
       case .done:
-        openRelaxWindow()
-        startTimer()
-        state = .relaxing
+        return automata1(.end)
       case .menuSetPredefined:
-        z4()
+        resetWorkTimer()
       case .menuWorkTimeUpdate:
         updateStatusBar(timerSettings.workTime)
       default: break
       }
-    case .relaxing:
-      switch e {
-      case .tick:
-        relaxTimerTick()
-      case .done:
-        if timerSettings.autoClose {
-          stopButtonPressed()
-        } else {
-          stopTimer()
-          backToWork()
-          startTimer()
-          state = .waiting
-        }
-      default: break
-      }
-    case .waiting:
-      switch e {
-      case .tick:
-        blink()
-      default: break
-      }
     }
+    return false
   }
 
   func timerInit() {
-    state = .stopped
+    state1 = .stopped
     setStoppedTimerMenu()
     updateStatusBar(timerSettings.workTime)
   }
@@ -175,7 +230,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   func startWorkTimerWithTime(_ time: Interval) {
-    state = .running
+    state1 = .running
     timerState = time
     timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.tick), userInfo: nil, repeats: true)
     setWorkingTimerMenu()
@@ -240,14 +295,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     timer.invalidate()
   }
 
-  @objc func relaxTimerTick() {
+  func relaxTimerTick() {
     timerState.tick()
-    if timerState.zero {
-      automata(.done)
-    } else {
-      updateStatusBar(timerState)
-      updateFullScreenWindow(timerState)
-    }
   }
   
   func blink() {
@@ -256,22 +305,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func nextButtonPressed() {
-    stopTimer()
-    closeFullScreenWindow()
+    automata(.close)
     startWorkTimerWithTick()
   }
   
   func addButtonPressed() {
-    stopTimer()
-    closeFullScreenWindow()
+    automata(.close)
     startWorkTimerWithTime(Interval(minutes: 1, seconds: 0))
     tick()
   }
 
   func stopButtonPressed() {
-    stopTimer()
-    timerInit()
-    closeFullScreenWindow()
+    automata(.close)
   }
   
   func createFullScreenWindow() {
@@ -312,7 +357,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     try? registerStats()
     try? readDefaults()
     try? readStats()
-    z4()
+    resetWorkTimer()
   }
 
   func applicationWillTerminate(_ aNotification: Notification) {
@@ -351,7 +396,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     setPredefinedSettings(TimerSettings.releaseTimerSettings)
   }
   
-  func z4() {
+  func resetWorkTimer() {
     session = 0
     timerInit()
     if timerSettings.autostart {
