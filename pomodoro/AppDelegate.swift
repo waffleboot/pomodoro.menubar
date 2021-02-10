@@ -11,8 +11,8 @@ enum State {
 enum Event {
   case tick
   case done
-  case menu1
-  case menu2
+  case menuSetPredefined
+  case menuWorkTimeUpdate
   case notify
 }
 
@@ -71,8 +71,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var minutes: Int
     var seconds: Int
+    var elapsed: Int
+
+    init(minutes: Int, seconds: Int) {
+      self.minutes = minutes
+      self.seconds = seconds
+      self.elapsed = 0
+    }
 
     mutating func tick() {
+      elapsed += 1
       if seconds > 0 {
         seconds -= 1
       } else if minutes > 0 {
@@ -166,7 +174,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   var color = false
   var state = State.stopped
   var timerState = Interval(minutes: 0, seconds: 0)
-  var seconds = 0
   var stats = Statistics()
   
   @objc func tick() {
@@ -180,11 +187,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       case .tick:
         workTimerTick()
       case .done:
+        stopTimer()
         workDone()
-        startRelax()
+        openRelaxWindow()
         startTimer()
         state = .relaxing
-      case .menu1:
+      case .menuSetPredefined:
         stopWorkTimer()
         z4()
       case .notify:
@@ -194,12 +202,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     case .stopped:
       switch e {
       case .done:
-        startRelax()
+        openRelaxWindow()
         startTimer()
         state = .relaxing
-      case .menu1:
+      case .menuSetPredefined:
         z4()
-      case .menu2:
+      case .menuWorkTimeUpdate:
         updateStatusBar(timerSettings.workTime)
       default: break
       }
@@ -229,7 +237,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   func timerInit() {
     state = .stopped
-    setPreWorkingMenu()
+    setStoppedTimerMenu()
     updateStatusBar(timerSettings.workTime)
   }
   
@@ -239,23 +247,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func startWorkTimer() {
-    if session >= timerSettings.sessions {
-      session = 0
-    }
-    session += 1
+    if session >= timerSettings.sessions { session = 0 }; session += 1
     startWorkTimerWithTime(timerSettings.workTime)
   }
 
   func startWorkTimerWithTime(_ time: Interval) {
-    seconds = 0
     state = .running
     timerState = time
     timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.tick), userInfo: nil, repeats: true)
     setWorkingTimerMenu()
   }
   
-  @objc func workTimerTick() {
-    seconds += 1
+  func workTimerTick() {
     timerState.tick()
     updateStatusBar(timerState)
     if timerState.zero {
@@ -266,9 +269,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func workDone() {
-    stats.add(seconds: seconds)
+    stats.add(seconds: timerState.elapsed)
     try? updateStats()
-    stopTimer()
   }
 
   func notify() {
@@ -282,9 +284,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   @objc func stopWorkTimer() {
     stopTimer()
+    workDone()
     timerInit()
-    stats.add(seconds: seconds)
-    try? updateStats()
   }
   
   func initRelaxTimer() {
@@ -297,7 +298,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
   }
 
-  func startRelax() {
+  func openRelaxWindow() {
     initRelaxTimer()
     createFullScreenWindow()
     updateStatusBar(timerState)
@@ -331,13 +332,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
   }
   
-  @objc func blink() {
+  func blink() {
     ctrl.messageLabel.textColor = color ? NSColor.white : NSColor.red
     color = !color
-  }
-  
-  @objc func stopRelaxTimer() {
-    stopButtonPressed()
   }
   
   func nextButtonPressed() {
@@ -397,22 +394,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     try? registerStats()
     try? readDefaults()
     try? readStats()
-    timerInit()
-    if timerSettings.autostart {
-      startWorkTimer()
-    }
+    z4()
   }
 
   func applicationWillTerminate(_ aNotification: Notification) {
 //    NSStatusBar.system.removeStatusItem(self.statusItem)
-  }
-
-  @objc func onMenuStart() {
-    startWorkTimerWithTick()
-  }
-  
-  @objc func onMenuStop() {
-    stopWorkTimer()
   }
 
   @objc func onBreakMenu() {
@@ -457,12 +443,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func setPredefinedSettings(_ settings: TimerSettings) {
     self.timerSettings = settings
-    automata(.menu1)
+    automata(.menuSetPredefined)
   }
 
-  func setPreWorkingMenu() {
+  func setStoppedTimerMenu() {
     let menu = NSMenu()
-    menu.addItem(NSMenuItem(title: "Start Pomodoro", action: #selector(AppDelegate.onMenuStart), keyEquivalent: "S"))
+    menu.addItem(NSMenuItem(title: "Start Pomodoro", action: #selector(AppDelegate.startWorkTimerWithTick), keyEquivalent: "S"))
     menu.addItem(NSMenuItem(title: "Start Break", action: #selector(AppDelegate.onBreakMenu), keyEquivalent: ""))
     addSettingsMenuItems(menu)
     menu.addItem(.separator())
@@ -472,7 +458,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func setWorkingTimerMenu() {
     let menu = NSMenu()
-    menu.addItem(NSMenuItem(title: "Stop Pomodoro", action: #selector(AppDelegate.onMenuStop), keyEquivalent: "S"))
+    menu.addItem(NSMenuItem(title: "Stop Pomodoro", action: #selector(AppDelegate.stopWorkTimer), keyEquivalent: "S"))
     menu.addItem(NSMenuItem(title: "Start Break", action: #selector(AppDelegate.onBreakMenu), keyEquivalent: ""))
     addSettingsMenuItems(menu)
     menu.addItem(.separator())
@@ -553,7 +539,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       timerSettings.workTime = $0
       try? updateDefaults()
     })
-    automata(.menu2)
+    automata(.menuWorkTimeUpdate)
   }
   
   @objc func onSmallTimeMenu(_ sender: NSMenuItem) {
