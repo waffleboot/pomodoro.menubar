@@ -4,11 +4,15 @@ import Cocoa
 enum State {
   case stopped
   case running
+  case relaxing
+  case waiting
 }
 
 enum Event {
   case tick
   case done
+  case menu1
+  case menu2
   case notify
 }
 
@@ -175,11 +179,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       switch e {
       case .tick: workTimerTick()
       case .done: workDone(); z3()
+      case .menu1: stopWorkTimer(); z4()
       case .notify: notify()
+      default: break
       }
     case .stopped:
       switch e {
       case .done: z3()
+      case .menu1: z4()
+      case .menu2: updateStatusBar(timerSettings.workTime)
+      default: break
+      }
+    case .relaxing:
+      switch e {
+      case .tick: relaxTimerTick()
+      default: break
+      }
+    case .waiting:
+      switch e {
+      case .tick: blink()
       default: break
       }
     }
@@ -268,7 +286,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     updateFullScreenWindow(timerState)
     openFullScreenWindow()
     statusItem.action = #selector(AppDelegate.stopRelaxTimer)
-    timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.relaxTimerTick), userInfo: nil, repeats: true)
+    state = .relaxing
+    timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.tick), userInfo: nil, repeats: true)
   }
 
   @objc func relaxTimerTick() {
@@ -283,7 +302,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         ctrl.nextButton.isHidden = false
         ctrl.tickerView.isHidden = true
         ctrl.window?.makeFirstResponder(ctrl.nextButton)
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.blink), userInfo: nil, repeats: true)
+        state = .waiting
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.tick), userInfo: nil, repeats: true)
       }
     } else {
       updateStatusBar(timerState)
@@ -407,11 +427,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     setPredefinedSettings(AppDelegate.releaseTimerSettings)
   }
   
-  func setPredefinedSettings(_ settings: TimerSettings) {
-    self.timerSettings = settings
-    if state == .running {
-      stopWorkTimer()
-    }
+  func z4() {
     session = 0
     timerInit()
     if timerSettings.autostart {
@@ -419,6 +435,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
   }
   
+  func setPredefinedSettings(_ settings: TimerSettings) {
+    self.timerSettings = settings
+    automata(.menu1)
+  }
+
   func setPreWorkingMenu() {
     let menu = NSMenu()
     menu.addItem(NSMenuItem(title: "Start Pomodoro", action: #selector(AppDelegate.onMenuStart), keyEquivalent: "S"))
@@ -512,9 +533,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       timerSettings.workTime = $0
       try? updateDefaults()
     })
-    if state == .stopped {
-      updateStatusBar(timerSettings.workTime)
-    }
+    automata(.menu2)
   }
   
   @objc func onSmallTimeMenu(_ sender: NSMenuItem) {
