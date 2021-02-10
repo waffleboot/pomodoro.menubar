@@ -17,6 +17,7 @@
                 <outlet property="prevLabel" destination="Ljo-mn-pvv" id="yXB-1K-mF6"/>
                 <outlet property="sessionLabel" destination="QWT-M4-Zo7" id="T5G-fr-5jG"/>
                 <outlet property="ssLabel" destination="bJ0-pJ-70s" id="Wb6-5h-CD5"/>
+                <outlet property="stopButton" destination="qcF-44-dSd" id="IxO-ce-bEm"/>
                 <outlet property="tickerView" destination="b0H-Uz-ayR" id="zEp-8b-s6r"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="5Sg-i7-O85"/>
             </connections>

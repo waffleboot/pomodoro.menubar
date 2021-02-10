@@ -46,6 +46,7 @@ class MyWindowController: NSWindowController, NSWindowDelegate {
   @IBOutlet weak var mmLabel: NSTextField!
   @IBOutlet weak var ssLabel: NSTextField!
   @IBOutlet weak var tickerView: NSView!
+  @IBOutlet weak var stopButton: NSButton!
   @IBOutlet weak var nextButton: NSButton!
   @IBOutlet weak var addButton:  NSButton!
   @IBOutlet weak var messageLabel: NSTextField!
@@ -284,6 +285,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     ctrl.addButton.isHidden  = true
     ctrl.nextButton.isHidden = false
     ctrl.tickerView.isHidden = true
+    ctrl.stopButton.nextKeyView = ctrl.nextButton
     ctrl.window?.makeFirstResponder(ctrl.nextButton)
   }
 
