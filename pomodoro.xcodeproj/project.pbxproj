@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		F539EB8E246E1F9300DD94C4 /* Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = F539EB8D246E1F9300DD94C4 /* Window.xib */; };
+		F561F27225D390C500B93329 /* Interval.swift in Sources */ = {isa = PBXBuildFile; fileRef = F561F27125D390C500B93329 /* Interval.swift */; };
 		F5FFEF99246C46AA003C0429 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FFEF98246C46AA003C0429 /* AppDelegate.swift */; };
 		F5FFEF9B246C46AA003C0429 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5FFEF9A246C46AA003C0429 /* Assets.xcassets */; };
 		F5FFEF9E246C46AA003C0429 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = F5FFEF9C246C46AA003C0429 /* MainMenu.xib */; };
@@ -15,6 +16,7 @@
 
 /* Begin PBXFileReference section */
 		F539EB8D246E1F9300DD94C4 /* Window.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Window.xib; sourceTree = "<group>"; };
+		F561F27125D390C500B93329 /* Interval.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interval.swift; sourceTree = "<group>"; };
 		F5FFEF95246C46AA003C0429 /* pomodoro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pomodoro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5FFEF98246C46AA003C0429 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F5FFEF9A246C46AA003C0429 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -59,6 +61,7 @@
 				F5FFEF9C246C46AA003C0429 /* MainMenu.xib */,
 				F5FFEF9F246C46AA003C0429 /* Info.plist */,
 				F5FFEFA0246C46AA003C0429 /* pomodoro.entitlements */,
+				F561F27125D390C500B93329 /* Interval.swift */,
 			);
 			path = pomodoro;
 			sourceTree = "<group>";
@@ -135,6 +138,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F561F27225D390C500B93329 /* Interval.swift in Sources */,
 				F5FFEF99246C46AA003C0429 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -67,38 +67,6 @@ class MyWindowController: NSWindowController, NSWindowDelegate {
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
   
-  struct Interval: Equatable, Codable {
-
-    var minutes: Int
-    var seconds: Int
-    var elapsed: Int
-
-    init(minutes: Int, seconds: Int) {
-      self.minutes = minutes
-      self.seconds = seconds
-      self.elapsed = 0
-    }
-
-    mutating func tick() {
-      elapsed += 1
-      if seconds > 0 {
-        seconds -= 1
-      } else if minutes > 0 {
-        minutes -= 1
-        seconds = 59
-      }
-    }
-    
-    static func == (lhs: Interval, rhs: Interval) -> Bool {
-      return lhs.minutes == rhs.minutes && lhs.seconds == rhs.seconds
-    }
-    
-    var zero: Bool {
-      return minutes == 0 && seconds == 0
-    }
-    
-  }
-  
   struct Statistics: Codable {
 
     var currentDate: Date?
@@ -677,9 +645,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     timerSettings.sessions = UserDefaults.standard.integer(forKey: AppDelegate.SessionsKey)
     timerSettings.autoClose = UserDefaults.standard.bool(forKey: AppDelegate.AutoCloseKey)
     timerSettings.autostart = UserDefaults.standard.bool(forKey: AppDelegate.AutoStartKey)
-    try timerSettings.workTime = decoder.decode(AppDelegate.Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.WorkTimeKey)!)
-    try timerSettings.smallTime = decoder.decode(AppDelegate.Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.SmallTimeKey)!)
-    try timerSettings.largeTime = decoder.decode(AppDelegate.Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.LargeTimeKey)!)
+    try timerSettings.workTime = decoder.decode(Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.WorkTimeKey)!)
+    try timerSettings.smallTime = decoder.decode(Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.SmallTimeKey)!)
+    try timerSettings.largeTime = decoder.decode(Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.LargeTimeKey)!)
     try timerSettings.notification = decoder.decode(AppDelegate.PomodoroNotification.self, from: UserDefaults.standard.data(forKey: AppDelegate.NotificationKey)!)
   }
 
