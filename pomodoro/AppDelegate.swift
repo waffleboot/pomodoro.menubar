@@ -151,7 +151,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   var color = false
   var running = false
   var timerState = Interval(minutes: 0, seconds: 0)
-  var counter = 0
+  var seconds = 0
   var stats = Statistics()
   
   func timerInit() {
@@ -175,7 +175,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   func startWorkTimerWithTime(_ time: Interval) {
-    counter = 0
+    seconds = 0
     running = true
     timerState = time
     statusItem.action = #selector(AppDelegate.stopWorkTimer)
@@ -184,7 +184,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   @objc func workTimerTick() {
-    counter += 1
+    seconds += 1
     timerState.tick()
     updateStatusBar(timerState)
     if timerState.zero {
@@ -197,7 +197,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func workDone() {
-    stats.add(seconds: counter)
+    stats.add(seconds: seconds)
     try? updateStats()
     timer.invalidate()
   }
@@ -214,7 +214,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   @objc func stopWorkTimer() {
     timer.invalidate()
     timerInit()
-    stats.add(seconds: counter)
+    stats.add(seconds: seconds)
     try? updateStats()
   }
   
