@@ -6,6 +6,12 @@ enum State {
   case running
 }
 
+enum Event {
+  case tick
+  case done
+  case notify
+}
+
 class MyButton: NSButton {
   override func drawFocusRingMask() {
     NSBezierPath.fill(bounds)
@@ -159,6 +165,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   var seconds = 0
   var stats = Statistics()
   
+  @objc func tick() {
+    automata(.tick)
+  }
+
+  func automata(_ e: Event) {
+    switch state {
+    case .running:
+      switch e {
+      case .tick: workTimerTick()
+      case .notify: notify()
+      case .done: z1()
+      default: break
+      }
+    default: break
+    }
+  }
+
   func timerInit() {
     state = .stopped
     setPreWorkingMenu()
@@ -184,20 +207,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     state = .running
     timerState = time
     statusItem.action = #selector(AppDelegate.stopWorkTimer)
-    timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.workTimerTick), userInfo: nil, repeats: true)
+    timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.tick), userInfo: nil, repeats: true)
     setWorkingTimerMenu()
   }
   
+  func z1() {
+    workDone()
+    z2()
+  }
+
+  func z2() {
+    initRelaxTimer()
+    startRelaxTimer()
+  }
+
   @objc func workTimerTick() {
     seconds += 1
     timerState.tick()
     updateStatusBar(timerState)
     if timerState.zero {
-      workDone()
-      initRelaxTimer()
-      startRelaxTimer()
+      automata(.done)
     } else if timerState == timerSettings.notification.when {
-      notify()
+      automata(.notify)
     }
   }
   
@@ -350,8 +381,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     if state == .running {
       workDone()
     }
-    initRelaxTimer()
-    startRelaxTimer()
+    z2()
   }
 
   @objc func onMenuQuit() {
