@@ -1,6 +1,11 @@
 
 import Cocoa
 
+enum State {
+  case stopped
+  case running
+}
+
 class MyButton: NSButton {
   override func drawFocusRingMask() {
     NSBezierPath.fill(bounds)
@@ -149,13 +154,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   var session = 0
   var color = false
-  var running = false
+  var state = State.stopped
   var timerState = Interval(minutes: 0, seconds: 0)
   var seconds = 0
   var stats = Statistics()
   
   func timerInit() {
-    running = false
+    state = .stopped
     setPreWorkingMenu()
     updateStatusBar(timerSettings.workTime)
     statusItem.action = #selector(AppDelegate.startWorkTimerWithTick)
@@ -176,7 +181,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   func startWorkTimerWithTime(_ time: Interval) {
     seconds = 0
-    running = true
+    state = .running
     timerState = time
     statusItem.action = #selector(AppDelegate.stopWorkTimer)
     timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(AppDelegate.workTimerTick), userInfo: nil, repeats: true)
@@ -342,7 +347,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   @objc func onBreakMenu() {
-    if running {
+    if state == .running {
       workDone()
     }
     initRelaxTimer()
@@ -379,7 +384,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func setPredefinedSettings(_ settings: TimerSettings) {
     self.timerSettings = settings
-    if running {
+    if state == .running {
       stopWorkTimer()
     }
     session = 0
@@ -482,7 +487,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       timerSettings.workTime = $0
       try? updateDefaults()
     })
-    if !running {
+    if state == .stopped {
       updateStatusBar(timerSettings.workTime)
     }
   }
