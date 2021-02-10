@@ -86,54 +86,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   }
 
-  struct PomodoroNotification: Codable {
-    var when: Interval
-    var title: String
-  }
-  
-  struct TimerSettings {
-    var debug: Bool
-    var autostart: Bool
-    var notification: PomodoroNotification
-    var sessions: Int
-    var workTime: Interval
-    var smallTime: Interval
-    var largeTime: Interval
-    var autoClose: Bool
-  }
-
-  static let fastTimerSettings = TimerSettings(
-    debug: true,
-    autostart: true,
-    notification: PomodoroNotification(when: Interval(minutes: 0, seconds: 1), title: "Last Second!"),
-    sessions: 2,
-    workTime: Interval(minutes: 0, seconds: 4),
-    smallTime: Interval(minutes: 0, seconds: 3),
-    largeTime: Interval(minutes: 0, seconds: 7),
-    autoClose: false)
-  
-  static let debugTimerSettings = TimerSettings(
-    debug: true,
-    autostart: true,
-    notification: PomodoroNotification(when: Interval(minutes: 0, seconds: 10), title: "Last Seconds!"),
-    sessions: 2,
-    workTime: Interval(minutes: 1, seconds: 10),
-    smallTime: Interval(minutes: 0, seconds: 3),
-    largeTime: Interval(minutes: 0, seconds: 3),
-    autoClose: false)
-  
-  static let releaseTimerSettings = TimerSettings(
-    debug: true,
-    autostart: false,
-    notification: PomodoroNotification(when: Interval(minutes: 1, seconds: 0), title: "Last Minute!"),
-    sessions: 2,
-    workTime: Interval(minutes: 25, seconds: 0),
-    smallTime: Interval(minutes: 5, seconds: 0),
-    largeTime: Interval(minutes: 20, seconds: 0),
-    autoClose: false)
-  
-  var timerSettings = AppDelegate.releaseTimerSettings
-
   var timer: Timer!
   var ctrl: MyWindowController!
   let statusItem = NSStatusBar.system.statusItem(withLength: -1)
@@ -142,6 +94,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   var color = false
   var state = State.stopped
   var timerState = Interval(minutes: 0, seconds: 0)
+  var timerSettings = TimerSettings.releaseTimerSettings
   var stats = Statistics()
   
   @objc func tick() {
@@ -390,15 +343,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   @objc func onMenuFast() {
-    setPredefinedSettings(AppDelegate.fastTimerSettings)
+    setPredefinedSettings(TimerSettings.fastTimerSettings)
   }
   
   @objc func onMenuDebug() {
-    setPredefinedSettings(AppDelegate.debugTimerSettings)
+    setPredefinedSettings(TimerSettings.debugTimerSettings)
   }
   
   @objc func onMenuRelease() {
-    setPredefinedSettings(AppDelegate.releaseTimerSettings)
+    setPredefinedSettings(TimerSettings.releaseTimerSettings)
   }
   
   func z4() {
@@ -616,14 +569,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   func registerDefaults() throws {
     let encoder = JSONEncoder()
+    let settings = TimerSettings.releaseTimerSettings
     try UserDefaults.standard.register(defaults: [
-      AppDelegate.SessionsKey:  AppDelegate.releaseTimerSettings.sessions,
-      AppDelegate.AutoCloseKey: AppDelegate.releaseTimerSettings.autoClose,
-      AppDelegate.AutoStartKey: AppDelegate.releaseTimerSettings.autostart,
-      AppDelegate.WorkTimeKey:  encoder.encode(AppDelegate.releaseTimerSettings.workTime),
-      AppDelegate.SmallTimeKey: encoder.encode(AppDelegate.releaseTimerSettings.smallTime),
-      AppDelegate.LargeTimeKey: encoder.encode(AppDelegate.releaseTimerSettings.largeTime),
-      AppDelegate.NotificationKey : encoder.encode(AppDelegate.releaseTimerSettings.notification)
+      AppDelegate.SessionsKey:  settings.sessions,
+      AppDelegate.AutoCloseKey: settings.autoClose,
+      AppDelegate.AutoStartKey: settings.autostart,
+      AppDelegate.WorkTimeKey:  encoder.encode(settings.workTime),
+      AppDelegate.SmallTimeKey: encoder.encode(settings.smallTime),
+      AppDelegate.LargeTimeKey: encoder.encode(settings.largeTime),
+      AppDelegate.NotificationKey : encoder.encode(settings.notification)
     ])
   }
 
@@ -648,7 +602,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     try timerSettings.workTime = decoder.decode(Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.WorkTimeKey)!)
     try timerSettings.smallTime = decoder.decode(Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.SmallTimeKey)!)
     try timerSettings.largeTime = decoder.decode(Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.LargeTimeKey)!)
-    try timerSettings.notification = decoder.decode(AppDelegate.PomodoroNotification.self, from: UserDefaults.standard.data(forKey: AppDelegate.NotificationKey)!)
+    try timerSettings.notification = decoder.decode(PomodoroNotification.self, from: UserDefaults.standard.data(forKey: AppDelegate.NotificationKey)!)
   }
 
   func registerStats() throws {
