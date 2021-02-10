@@ -54,10 +54,10 @@
                                 </textFieldCell>
                             </textField>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="b0H-Uz-ayR">
-                                <rect key="frame" x="71" y="109" width="370" height="114"/>
+                                <rect key="frame" x="0.0" y="109" width="512" height="114"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OxQ-f9-N4v">
-                                        <rect key="frame" x="11" y="0.0" width="164" height="114"/>
+                                        <rect key="frame" x="82" y="0.0" width="164" height="114"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" title="mm" id="Je9-jm-8a3">
                                             <font key="font" metaFont="system" size="96"/>
                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -65,7 +65,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jcJ-4k-jbj">
-                                        <rect key="frame" x="171" y="0.0" width="29" height="114"/>
+                                        <rect key="frame" x="242" y="0.0" width="29" height="114"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" title=":" id="siF-dj-M3C">
                                             <font key="font" metaFont="system" size="96"/>
                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -73,7 +73,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bJ0-pJ-70s">
-                                        <rect key="frame" x="196" y="0.0" width="97" height="114"/>
+                                        <rect key="frame" x="267" y="0.0" width="97" height="114"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" title="ss" id="W1I-Dn-xxw">
                                             <font key="font" metaFont="system" size="96"/>
                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -108,7 +108,7 @@
                                         </buttonCell>
                                         <connections>
                                             <action selector="stop:" target="-2" id="DoK-mC-3c4"/>
-                                            <outlet property="nextKeyView" destination="sqZ-8M-b7E" id="LmR-Wq-BWJ"/>
+                                            <outlet property="nextKeyView" destination="UX7-Hg-7SZ" id="mZf-Hy-jkf"/>
                                         </connections>
                                     </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UX7-Hg-7SZ" userLabel="addButton" customClass="MyButton" customModule="pomodoro" customModuleProvider="target">
@@ -123,7 +123,7 @@
                                         </buttonCell>
                                         <connections>
                                             <action selector="add:" target="-2" id="QPJ-jx-Jij"/>
-                                            <outlet property="nextKeyView" destination="sqZ-8M-b7E" id="Tcu-5t-J3P"/>
+                                            <outlet property="nextKeyView" destination="qcF-44-dSd" id="Ssg-oL-Mam"/>
                                         </connections>
                                     </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sqZ-8M-b7E" userLabel="nextButton" customClass="MyButton" customModule="pomodoro" customModuleProvider="target">
