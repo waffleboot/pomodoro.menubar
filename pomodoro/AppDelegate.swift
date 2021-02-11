@@ -111,7 +111,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   var timerSettings = TimerSettings.releaseTimerSettings
   var stats = Statistics()
   
-  var stopMenuItem: NSMenuItem!
+  var stopMenuItem: NSMenuItem?
   var autoStartMenuItem: NSMenuItem!
 
   @objc func tick() {
@@ -397,10 +397,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   @objc func onMenuEnableStop(_ sender: NSMenuItem) {
     timerSettings.enableStop = !timerSettings.enableStop
     if timerSettings.enableStop {
-      stopMenuItem.isHidden      = false
+      stopMenuItem?.isHidden     = false
       autoStartMenuItem.isHidden = false
     } else {
-      stopMenuItem.isHidden      = true
+      stopMenuItem?.isHidden     = true
       autoStartMenuItem.isHidden = true
       timerSettings.autostart    = true
       autoStartMenuItem.state    = .on
@@ -447,8 +447,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func setWorkingTimerMenu() {
     let menu = NSMenu()
     stopMenuItem = NSMenuItem(title: "Stop Pomodoro", action: #selector(AppDelegate.stopWorkTimer), keyEquivalent: "S")
-    stopMenuItem.isHidden = !timerSettings.enableStop
-    menu.addItem(stopMenuItem)
+    stopMenuItem!.isHidden = !timerSettings.enableStop
+    menu.addItem(stopMenuItem!)
     menu.addItem(NSMenuItem(title: "Start Break", action: #selector(AppDelegate.onBreakMenu), keyEquivalent: ""))
     addSettingsMenuItems(menu)
     menu.addItem(.separator())
