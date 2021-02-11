@@ -14,6 +14,7 @@ struct TimerSettings {
   var smallTime: Interval
   var largeTime: Interval
   var autoClose: Bool
+  var enableStop: Bool
 
   static let fastTimerSettings = TimerSettings(
     debug: true,
@@ -23,7 +24,8 @@ struct TimerSettings {
     workTime: Interval(minutes: 0, seconds: 4),
     smallTime: Interval(minutes: 0, seconds: 3),
     largeTime: Interval(minutes: 0, seconds: 7),
-    autoClose: false)
+    autoClose: false,
+    enableStop: true)
 
   static let debugTimerSettings = TimerSettings(
     debug: true,
@@ -33,7 +35,8 @@ struct TimerSettings {
     workTime: Interval(minutes: 1, seconds: 10),
     smallTime: Interval(minutes: 0, seconds: 3),
     largeTime: Interval(minutes: 0, seconds: 3),
-    autoClose: false)
+    autoClose: false,
+    enableStop: true)
 
   static let releaseTimerSettings = TimerSettings(
     debug: true,
@@ -43,7 +46,8 @@ struct TimerSettings {
     workTime: Interval(minutes: 25, seconds: 0),
     smallTime: Interval(minutes: 5, seconds: 0),
     largeTime: Interval(minutes: 20, seconds: 0),
-    autoClose: false)
+    autoClose: false,
+    enableStop: false)
 
 }
 

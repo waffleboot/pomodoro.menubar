@@ -111,6 +111,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   var timerSettings = TimerSettings.releaseTimerSettings
   var stats = Statistics()
   
+  var stopMenuItem: NSMenuItem!
+  var autoStartMenuItem: NSMenuItem!
+
   @objc func tick() {
     automata(.tick)
   }
@@ -329,6 +332,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     ctrl.window?.level = NSWindow.Level.init(NSWindow.Level.mainMenu.rawValue+2)
     ctrl.window?.backgroundColor = NSColor.black
     ctrl.nextButton.isHidden = true
+    if !timerSettings.enableStop {
+      ctrl.stopButton.isHidden = true
+      ctrl.nextButton.nextKeyView = nil
+      ctrl.addButton.nextKeyView = nil
+    }
     ctrl.currLabel.stringValue = String(format: "%02d:%02d", stats.currentMinutes/60, stats.currentMinutes%60)
     ctrl.prevLabel.stringValue = String(format: "%02d:%02d", stats.previousMinutes/60, stats.previousMinutes%60)
     ctrl.sessionLabel.stringValue = "\(timerSettings.sessions - session)"
@@ -386,6 +394,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     try? updateDefaults()
   }
   
+  @objc func onMenuEnableStop(_ sender: NSMenuItem) {
+    timerSettings.enableStop = !timerSettings.enableStop
+    if timerSettings.enableStop {
+      stopMenuItem.isHidden      = false
+      autoStartMenuItem.isHidden = false
+    } else {
+      stopMenuItem.isHidden      = true
+      autoStartMenuItem.isHidden = true
+      timerSettings.autostart    = true
+      autoStartMenuItem.state    = .on
+    }
+    sender.state = timerSettings.enableStop ? .on : .off
+    try? updateDefaults()
+  }
+
   @objc func onMenuFast() {
     setPredefinedSettings(TimerSettings.fastTimerSettings)
   }
@@ -423,7 +446,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func setWorkingTimerMenu() {
     let menu = NSMenu()
-    menu.addItem(NSMenuItem(title: "Stop Pomodoro", action: #selector(AppDelegate.stopWorkTimer), keyEquivalent: "S"))
+    stopMenuItem = NSMenuItem(title: "Stop Pomodoro", action: #selector(AppDelegate.stopWorkTimer), keyEquivalent: "S")
+    stopMenuItem.isHidden = !timerSettings.enableStop
+    menu.addItem(stopMenuItem)
     menu.addItem(NSMenuItem(title: "Start Break", action: #selector(AppDelegate.onBreakMenu), keyEquivalent: ""))
     addSettingsMenuItems(menu)
     menu.addItem(.separator())
@@ -459,9 +484,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     submenu1.state = timerSettings.autoClose ? .on : .off
     menu.addItem(submenu1)
 
-    let submenu2 = NSMenuItem(title: "AutoStart", action: #selector(AppDelegate.onMenuAutoStart), keyEquivalent: "")
-    submenu2.state = timerSettings.autostart ? .on : .off
-    menu.addItem(submenu2)
+    autoStartMenuItem = NSMenuItem(title: "AutoStart", action: #selector(AppDelegate.onMenuAutoStart), keyEquivalent: "")
+    autoStartMenuItem.state = timerSettings.autostart ? .on : .off
+    autoStartMenuItem.isHidden = !timerSettings.enableStop
+    menu.addItem(autoStartMenuItem)
+
+    let submenu3 = NSMenuItem(title: "EnableStop", action: #selector(AppDelegate.onMenuEnableStop), keyEquivalent: "")
+    submenu3.state = timerSettings.enableStop ? .on : .off
+    menu.addItem(submenu3)
 
     menu.addItem(.separator())
     menu.addItem(NSMenuItem(title: "Fast Pomodoro", action: #selector(AppDelegate.onMenuFast), keyEquivalent: ""))
@@ -603,13 +633,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   static let NotificationKey = "NotificationKey"
-  static let AutoCloseKey = "AutoCloseKey"
-  static let AutoStartKey = "AutoStartKey"
-  static let SessionsKey  = "SessionsKey"
-  static let WorkTimeKey  = "WorkTimeKey"
-  static let SmallTimeKey = "SmallTimeKey"
-  static let LargeTimeKey = "LargeTimeKey"
-  static let StatsKey     = "StatsKey"
+  static let AutoCloseKey    = "AutoCloseKey"
+  static let EnableStopKey   = "EnableStopKey"
+  static let AutoStartKey    = "AutoStartKey"
+  static let SessionsKey     = "SessionsKey"
+  static let WorkTimeKey     = "WorkTimeKey"
+  static let SmallTimeKey    = "SmallTimeKey"
+  static let LargeTimeKey    = "LargeTimeKey"
+  static let StatsKey        = "StatsKey"
 
   func registerDefaults() throws {
     let encoder = JSONEncoder()
@@ -617,6 +648,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     try UserDefaults.standard.register(defaults: [
       AppDelegate.SessionsKey:  settings.sessions,
       AppDelegate.AutoCloseKey: settings.autoClose,
+      AppDelegate.EnableStopKey:settings.enableStop,
       AppDelegate.AutoStartKey: settings.autostart,
       AppDelegate.WorkTimeKey:  encoder.encode(settings.workTime),
       AppDelegate.SmallTimeKey: encoder.encode(settings.smallTime),
@@ -630,6 +662,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let encoder = JSONEncoder()
     UserDefaults.standard.set(timerSettings.sessions, forKey: AppDelegate.SessionsKey)
     UserDefaults.standard.set(timerSettings.autoClose, forKey: AppDelegate.AutoCloseKey)
+    UserDefaults.standard.set(timerSettings.enableStop, forKey: AppDelegate.EnableStopKey)
     UserDefaults.standard.set(timerSettings.autostart, forKey: AppDelegate.AutoStartKey)
     try UserDefaults.standard.set(encoder.encode(timerSettings.workTime), forKey: AppDelegate.WorkTimeKey)
     try UserDefaults.standard.set(encoder.encode(timerSettings.smallTime), forKey: AppDelegate.SmallTimeKey)
@@ -642,6 +675,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     timerSettings.debug = false
     timerSettings.sessions = UserDefaults.standard.integer(forKey: AppDelegate.SessionsKey)
     timerSettings.autoClose = UserDefaults.standard.bool(forKey: AppDelegate.AutoCloseKey)
+    timerSettings.enableStop = UserDefaults.standard.bool(forKey: AppDelegate.EnableStopKey)
     timerSettings.autostart = UserDefaults.standard.bool(forKey: AppDelegate.AutoStartKey)
     try timerSettings.workTime = decoder.decode(Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.WorkTimeKey)!)
     try timerSettings.smallTime = decoder.decode(Interval.self, from: UserDefaults.standard.data(forKey: AppDelegate.SmallTimeKey)!)
